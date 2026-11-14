@@ -7,7 +7,8 @@ const replacements={
  'assets/icon-192.png':await image('assets/icon-192.png','image/png'),
  'assets/bowl.jpg':await image('assets/bowl.jpg','image/jpeg'),
  'assets/welcome.jpg':await image('assets/welcome.jpg','image/jpeg'),
- 'assets/products/milka-7622210834751.jpg':await image('assets/products/milka-7622210834751.jpg','image/jpeg')
+ 'assets/products/milka-7622210834751.jpg':await image('assets/products/milka-7622210834751.jpg','image/jpeg'),
+ 'assets/products/water-4820051240233.jpg':await image('assets/products/water-4820051240233.jpg','image/jpeg')
 };
 const replaceAssets=s=>Object.entries(replacements).reduce((text,[p,v])=>text.replaceAll(p,v),s);
 let html=await read('index.html');html=html.replace(/\s*<link rel="manifest"[^>]*>/,'').replace(/\s*<link rel="stylesheet"[^>]*>/,'').replace(/\s*<script defer[^>]*><\/script>/g,'');

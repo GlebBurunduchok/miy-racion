@@ -11,6 +11,9 @@ function total(entries,key){let value=0,knownCount=0;for(const e of entries){if(
 function safeImage(url){return typeof url==='string'&&url.length<1200&&/^https:\/\/(?:images\.openfoodfacts\.org|static\.openfoodfacts\.org|www\.tablycjakalorijnosti\.com\.ua)\//.test(url);}
 const oldValid=C.validFood;
 C.validFood=f=>oldValid(f)&&extras.every(k=>f[k]==null||known(f[k])&&f[k]<=100)&&['calcium','iron','potassium','vitaminC'].every(k=>f[k]==null||known(f[k])&&f[k]<=100000)&&(!f.imageUrl||safeImage(f.imageUrl))&&(!f.thumbnailUrl||safeImage(f.thumbnailUrl))&&(!f.nutriScore||/^[abcde]$/.test(f.nutriScore));
+C.validCatalogFood=f=>!!f&&['kcal','p','f','c'].every(k=>f[k]===null||known(f[k]))&&C.validFood({...f,kcal:f.kcal??0,p:f.p??0,f:f.f??0,c:f.c??0});
+C.barcodeKey=code=>/^\d{8,14}$/.test(String(code))?String(code).padStart(14,'0'):null;
+C.barcodeCandidates=code=>{code=String(code);if(!C.barcodeKey(code))return [];const result=[code];if(code.length===14&&code[0]==='0')result.push(code.slice(1));else if(code.length===12)result.push('0'+code);else if(code.length===13&&code[0]==='0')result.push(code.slice(1));return [...new Set(result)];};
 const oldState=C.validState;
 C.validState=s=>oldState(s)&&(s.extraTargets==null||extras.every(k=>s.extraTargets[k]==null||known(s.extraTargets[k])&&s.extraTargets[k]<=1000))&&s.customFoods.every(C.validFood)&&Object.values(s.days).every(d=>d.entries.every(e=>C.validFood(e.food)));
 const oldMigrate=C.migrate;
