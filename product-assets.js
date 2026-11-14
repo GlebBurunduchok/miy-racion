@@ -1,14 +1,629 @@
 /* Milka product and photo: Open Food Facts contributors, CC BY-SA. */
-window.RATION_PRODUCT_IMAGES = {"off-7622210834751":"assets/products/milka-7622210834751.jpg"};
-window.RATION_EXTENDED.push({"id":"off-7622210834751","names":["Milka Oreo","Milka Oreo","Milka Oreo"],"brand":"Milka Oreo","kcal":559,"p":5,"f":35,"c":56,"fiber":0.2,"sugars":50,"salt":0.45,"saturatedFat":19,"imageUrl":"https://images.openfoodfacts.org/images/products/762/221/083/4751/front_en.42.400.jpg","thumbnailUrl":"https://images.openfoodfacts.org/images/products/762/221/083/4751/front_en.42.200.jpg","source":"off","category":"other","emoji":"🍫","barcode":"7622210834751","sourceUrl":"https://world.openfoodfacts.org/product/7622210834751","detailsLoaded":true,"nutriScore":"e"});
+window.RATION_PRODUCT_IMAGES = { 'off-7622210834751': 'assets/products/milka-7622210834751.jpg' };
+window.RATION_EXTENDED.push({
+  id: 'off-7622210834751',
+  names: ['Milka Oreo', 'Milka Oreo', 'Milka Oreo'],
+  brand: 'Milka Oreo',
+  kcal: 559,
+  p: 5,
+  f: 35,
+  c: 56,
+  fiber: 0.2,
+  sugars: 50,
+  salt: 0.45,
+  saturatedFat: 19,
+  imageUrl: 'https://images.openfoodfacts.org/images/products/762/221/083/4751/front_en.42.400.jpg',
+  thumbnailUrl:
+    'https://images.openfoodfacts.org/images/products/762/221/083/4751/front_en.42.200.jpg',
+  source: 'off',
+  category: 'other',
+  emoji: '🍫',
+  barcode: '7622210834751',
+  sourceUrl: 'https://world.openfoodfacts.org/product/7622210834751',
+  detailsLoaded: true,
+  nutriScore: 'e'
+});
 
 /* Public source images are linked; nutrition values come from each original product. */
-window.RATION_PRODUCT_DETAILS={"tab-d10ffdda00be195b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/d10ffdda00be195b/5bd071be92d10ec7","fiber":2,"calcium":12,"saturatedFat":0.1,"salt":0,"sugars":19,"detailsLoaded":true},"tab-e527fce85e18fc17":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/e527fce85e18fc17/5c63c9b752e94f21b6a481e52c95341f","calcium":50,"saturatedFat":3.22,"salt":0.35,"sugars":1.1,"detailsLoaded":true},"tab-73a02350d55a3f8f":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/73a02350d55a3f8f/6ca16719eb45471581c7d7ae2f7263af","calcium":0,"saturatedFat":0,"salt":0,"sugars":0,"detailsLoaded":true},"tab-47c3415addecabd5":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/47c3415addecabd5/b7dcb0a8a62aa52b","fiber":0.93,"calcium":18.09,"saturatedFat":0.07,"sugars":1.47,"detailsLoaded":true},"tab-16c75256f2d25284":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/16c75256f2d25284/d2e7f261da1e4022b769dbdd35002358","fiber":1,"calcium":9,"saturatedFat":0.03,"salt":0.01,"sugars":2.6,"detailsLoaded":true},"tab-3eca88e5464701a6":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/3eca88e5464701a6/74ca0dbbd2f247ef81103ef72e47c199","calcium":2,"sugars":0,"detailsLoaded":true},"tab-bf78a2be17b25bb9":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/bf78a2be17b25bb9/18216f3cd05d3373","fiber":1.64,"calcium":0,"saturatedFat":0.04,"sugars":2.87,"detailsLoaded":true},"tab-99bee9c853cc6300":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/99bee9c853cc6300/ecafe79f9fd74d08a1d8882cd1d2cc5a","fiber":3.4,"calcium":0,"saturatedFat":0,"salt":0.4,"sugars":0,"detailsLoaded":true},"tab-7a9c53538d64527a":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7a9c53538d64527a/d32533f9ff73529a","calcium":54.05,"saturatedFat":3.37,"salt":0.35,"sugars":0.34,"detailsLoaded":true},"tab-4900ad8b929a3935":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/4900ad8b929a3935/becb194ef5bc4f9fa530401ccce1145e","sugars":1,"detailsLoaded":true},"tab-2656b916d820c23b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/2656b916d820c23b/439c9e8a4c7049e3944265062ac20b7e","fiber":2,"calcium":5,"sugars":12,"detailsLoaded":true},"tab-828a972559734e2b85227a44943baede":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/828a972559734e2b85227a44943baede/afa94c2244e4452a87c2cb380a4c25ec","fiber":4,"calcium":142,"saturatedFat":0.8,"salt":2,"sugars":6,"detailsLoaded":true},"tab-e7055e813d58f81c":{"calcium":125,"saturatedFat":1,"salt":0.1,"sugars":4.7,"detailsLoaded":true},"tab-065ff848f76a68d5":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/065ff848f76a68d5/4906ebff338a42cab024a4535807d933","fiber":0,"calcium":15,"saturatedFat":1,"salt":0.19,"sugars":0,"detailsLoaded":true},"tab-224ae0139ba949f7":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/224ae0139ba949f7/e610e99fcfadca27","fiber":1.7,"saturatedFat":0.06,"sugars":4.2,"detailsLoaded":true},"tab-be6d607c02cef788":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/be6d607c02cef788/e2611f3b69cd45b2af8774eec3b0145b","fiber":0,"calcium":0,"saturatedFat":0,"sugars":99.5,"detailsLoaded":true}};
-for(const f of window.RATION_EXTENDED){const detail=window.RATION_PRODUCT_DETAILS[f.id];if(detail)Object.assign(f,detail);}
+window.RATION_PRODUCT_DETAILS = {
+  'tab-d10ffdda00be195b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/d10ffdda00be195b/5bd071be92d10ec7',
+    fiber: 2,
+    calcium: 12,
+    saturatedFat: 0.1,
+    salt: 0,
+    sugars: 19,
+    detailsLoaded: true
+  },
+  'tab-e527fce85e18fc17': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/e527fce85e18fc17/5c63c9b752e94f21b6a481e52c95341f',
+    calcium: 50,
+    saturatedFat: 3.22,
+    salt: 0.35,
+    sugars: 1.1,
+    detailsLoaded: true
+  },
+  'tab-73a02350d55a3f8f': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/73a02350d55a3f8f/6ca16719eb45471581c7d7ae2f7263af',
+    calcium: 0,
+    saturatedFat: 0,
+    salt: 0,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-47c3415addecabd5': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/47c3415addecabd5/b7dcb0a8a62aa52b',
+    fiber: 0.93,
+    calcium: 18.09,
+    saturatedFat: 0.07,
+    sugars: 1.47,
+    detailsLoaded: true
+  },
+  'tab-16c75256f2d25284': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/16c75256f2d25284/d2e7f261da1e4022b769dbdd35002358',
+    fiber: 1,
+    calcium: 9,
+    saturatedFat: 0.03,
+    salt: 0.01,
+    sugars: 2.6,
+    detailsLoaded: true
+  },
+  'tab-3eca88e5464701a6': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/3eca88e5464701a6/74ca0dbbd2f247ef81103ef72e47c199',
+    calcium: 2,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-bf78a2be17b25bb9': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/bf78a2be17b25bb9/18216f3cd05d3373',
+    fiber: 1.64,
+    calcium: 0,
+    saturatedFat: 0.04,
+    sugars: 2.87,
+    detailsLoaded: true
+  },
+  'tab-99bee9c853cc6300': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/99bee9c853cc6300/ecafe79f9fd74d08a1d8882cd1d2cc5a',
+    fiber: 3.4,
+    calcium: 0,
+    saturatedFat: 0,
+    salt: 0.4,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-7a9c53538d64527a': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7a9c53538d64527a/d32533f9ff73529a',
+    calcium: 54.05,
+    saturatedFat: 3.37,
+    salt: 0.35,
+    sugars: 0.34,
+    detailsLoaded: true
+  },
+  'tab-4900ad8b929a3935': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/4900ad8b929a3935/becb194ef5bc4f9fa530401ccce1145e',
+    sugars: 1,
+    detailsLoaded: true
+  },
+  'tab-2656b916d820c23b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/2656b916d820c23b/439c9e8a4c7049e3944265062ac20b7e',
+    fiber: 2,
+    calcium: 5,
+    sugars: 12,
+    detailsLoaded: true
+  },
+  'tab-828a972559734e2b85227a44943baede': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/828a972559734e2b85227a44943baede/afa94c2244e4452a87c2cb380a4c25ec',
+    fiber: 4,
+    calcium: 142,
+    saturatedFat: 0.8,
+    salt: 2,
+    sugars: 6,
+    detailsLoaded: true
+  },
+  'tab-e7055e813d58f81c': {
+    calcium: 125,
+    saturatedFat: 1,
+    salt: 0.1,
+    sugars: 4.7,
+    detailsLoaded: true
+  },
+  'tab-065ff848f76a68d5': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/065ff848f76a68d5/4906ebff338a42cab024a4535807d933',
+    fiber: 0,
+    calcium: 15,
+    saturatedFat: 1,
+    salt: 0.19,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-224ae0139ba949f7': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/224ae0139ba949f7/e610e99fcfadca27',
+    fiber: 1.7,
+    saturatedFat: 0.06,
+    sugars: 4.2,
+    detailsLoaded: true
+  },
+  'tab-be6d607c02cef788': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/be6d607c02cef788/e2611f3b69cd45b2af8774eec3b0145b',
+    fiber: 0,
+    calcium: 0,
+    saturatedFat: 0,
+    sugars: 99.5,
+    detailsLoaded: true
+  }
+};
+for (const f of window.RATION_EXTENDED) {
+  const detail = window.RATION_PRODUCT_DETAILS[f.id];
+  if (detail) Object.assign(f, detail);
+}
 
 /* Source record has no macro values. Completion is required before logging. */
-window.RATION_BARCODE_CATALOG=[{"id":"off-4820051240233","names":["Вода мінеральна негазована","Вода мінеральна негазована","Вода мінеральна негазована"],"brand":"Карпатська Джерельна","kcal":null,"p":null,"f":null,"c":null,"category":"drink","emoji":"💧","source":"off","barcode":"4820051240233","sourceUrl":"https://world.openfoodfacts.org/product/4820051240233","nutritionIncomplete":true,"plainWaterCandidate":true,"imageUrl":"https://images.openfoodfacts.org/images/products/482/005/124/0233/front_uk.13.400.jpg","imageSource":"off","thumbnailUrl":"https://images.openfoodfacts.org/images/products/482/005/124/0233/front_uk.13.200.jpg"}];
-window.RATION_PRODUCT_IMAGES["off-4820051240233"]="assets/products/water-4820051240233.jpg";
+window.RATION_BARCODE_CATALOG = [
+  {
+    id: 'off-4820051240233',
+    names: [
+      'Вода мінеральна негазована',
+      'Вода мінеральна негазована',
+      'Вода мінеральна негазована'
+    ],
+    brand: 'Карпатська Джерельна',
+    kcal: null,
+    p: null,
+    f: null,
+    c: null,
+    category: 'drink',
+    emoji: '💧',
+    source: 'off',
+    barcode: '4820051240233',
+    sourceUrl: 'https://world.openfoodfacts.org/product/4820051240233',
+    nutritionIncomplete: true,
+    plainWaterCandidate: true,
+    imageUrl:
+      'https://images.openfoodfacts.org/images/products/482/005/124/0233/front_uk.13.400.jpg',
+    imageSource: 'off',
+    thumbnailUrl:
+      'https://images.openfoodfacts.org/images/products/482/005/124/0233/front_uk.13.200.jpg'
+  }
+];
+window.RATION_PRODUCT_IMAGES['off-4820051240233'] = 'assets/products/water-4820051240233.jpg';
 
-Object.assign(window.RATION_PRODUCT_DETAILS,{"tab-4eb84f318e0bd5b3":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/4eb84f318e0bd5b3/d23e64b6107faea0","fiber":0.69,"calcium":0.01,"saturatedFat":0,"sugars":6,"detailsLoaded":true},"tab-989727f6053953b3":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5d8803c501c84addb2ba69a2effac35d/7c58d249dc994a50bba2b94cc9da3837","fiber":0,"saturatedFat":17,"salt":1.3,"sugars":0,"detailsLoaded":true},"tab-7f8d4878ec364bc9a6e8c3e0951250a1":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7f8d4878ec364bc9a6e8c3e0951250a1/032dc56f267d4a5ab7a6811a075e05a8","detailsLoaded":true},"tab-5fbaf8a981330620":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/c4095ebfb96a4107a398f2fac3fcf23f/8a556ee3401a412d89f3bfceb2bc9fc2","fiber":1.6,"saturatedFat":0.5,"salt":0.1,"sugars":0,"detailsLoaded":true},"tab-6ff6ad6f78bc4ac1b6ec8029f70a0b18":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/6ff6ad6f78bc4ac1b6ec8029f70a0b18/89349af7e48b48118957f22953d8f76a","fiber":0,"calcium":62,"saturatedFat":4.32,"sugars":0,"detailsLoaded":true},"tab-04d68836c835b0e7":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/04d68836c835b0e7/20662821b6b145fa9055f5dca8f990b6","fiber":0,"calcium":13,"saturatedFat":0.9,"salt":0.15,"sugars":0,"detailsLoaded":true},"tab-2e461408a628918b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/2e461408a628918b/d59da919e0194d9f8841bca730a723f8","fiber":3.34,"calcium":11.82,"saturatedFat":0.05,"sugars":10.29,"detailsLoaded":true},"tab-44bf4852d2acf296":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/44bf4852d2acf296/4dee52d9502543fcb1c22e11e783a437","calcium":24,"saturatedFat":51,"salt":0,"sugars":1,"detailsLoaded":true},"tab-f84396c0502b4468":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/f84396c0502b4468/9ed9b158d69c4e28bfa5a8f0d992f294","fiber":6.4,"calcium":28,"saturatedFat":0.3,"salt":1,"sugars":2.1,"detailsLoaded":true},"tab-13fc72f4396fc7b2":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/13fc72f4396fc7b2/80e832e5807640d6bfde82acab34e437","fiber":1.2,"calcium":10.6,"saturatedFat":0.31,"salt":0.41,"sugars":0.2,"detailsLoaded":true},"tab-5680b261b63b56f0":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5680b261b63b56f0/6b8f0b73d0274f5a8c9099e38d03d40e","fiber":1.13,"saturatedFat":2.88,"salt":0.22,"sugars":0.81,"detailsLoaded":true},"tab-ea6435123b76cd55":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/ea6435123b76cd55/7d24c80bd5794e76acd64c9ba0bf55c9","detailsLoaded":true},"tab-e349dabc71d7da0c":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/e349dabc71d7da0c/c982583cea6f4df6961d7142b121748a","fiber":5.5,"calcium":14.6,"saturatedFat":2.77,"sugars":0.5,"detailsLoaded":true},"tab-aa916f3d795d6a04":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/aa916f3d795d6a04/654e1fc20ea582c1","fiber":1.4,"calcium":27,"saturatedFat":0.04,"salt":0.07,"detailsLoaded":true},"tab-d990f1757cd95b52":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/d990f1757cd95b52/dbb349279bd34bb087d4d706c342a272","fiber":0.9,"calcium":19,"sugars":0.11,"detailsLoaded":true},"tab-864db12a472e8f96":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/864db12a472e8f96/53fbb26da26f47ed8ca4428ffaf51e04","fiber":1.8,"calcium":0,"saturatedFat":0,"salt":0,"sugars":8,"detailsLoaded":true},"tab-7dce3c1d4ced9380":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7dce3c1d4ced9380/eb49c35ee1d04d289da0eaeb4719c832","calcium":60,"saturatedFat":1.4,"salt":0.05,"sugars":3.3,"detailsLoaded":true},"tab-47986460d52546728ad28f7d5c6c1d04":{"calcium":120,"saturatedFat":1.5,"salt":0.1,"sugars":4.7,"detailsLoaded":true},"tab-7254cfc54d83413996206c5fd76c5ae2":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7254cfc54d83413996206c5fd76c5ae2/22507501afb74e1982e4d90f51a2c0c5","fiber":1.6,"calcium":8.57,"saturatedFat":0.06,"sugars":10,"detailsLoaded":true},"tab-b6b9f60d492060f4":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b6b9f60d492060f4/950c311d6345401dad445fdf6bc10222","fiber":3.8,"calcium":18,"saturatedFat":0.3,"salt":1.12,"sugars":0.47,"detailsLoaded":true},"tab-0377c2552b7b429e":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/0377c2552b7b429e/0788a366c43045319d24de35fc4495ec","fiber":0,"calcium":50,"saturatedFat":2.9,"salt":0.75,"sugars":0.5,"detailsLoaded":true},"tab-1ead41825beb3a85":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/1ead41825beb3a85/160b8d5ceab14fecb69383f82f9acd9b","fiber":1.5,"calcium":6,"saturatedFat":0,"sugars":8.4,"detailsLoaded":true},"tab-69bab942084cac6f":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/69bab942084cac6f/7db2c604336a4dbe8b2e72aa7eed34ef","calcium":4.99,"saturatedFat":0.01,"sugars":80.13,"detailsLoaded":true},"tab-dd220a53d5d745178457a32910e432d5":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/dd220a53d5d745178457a32910e432d5/79ed5b91dcf248629cae5aa2eeb94756","fiber":1.3,"calcium":7,"saturatedFat":0.03,"salt":0.01,"sugars":2.5,"detailsLoaded":true},"tab-936fae1caea54587":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/936fae1caea54587/8b8319d0844648c88a7dad45c318731e","fiber":4,"calcium":10,"sugars":0.2,"detailsLoaded":true},"tab-6eac6ced7f64df6c":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/6eac6ced7f64df6c/577c580b86454497942bd769233dc019","fiber":0,"sugars":4.7,"detailsLoaded":true},"tab-8984ee5c8b5d4e4d8998afd535bade56":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/8984ee5c8b5d4e4d8998afd535bade56/7a46b57b070241bf866e04ddd23c6b31","fiber":0,"calcium":4,"saturatedFat":0,"salt":0,"sugars":2.58,"detailsLoaded":true},"tab-02d5ba649347b5d7":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/02d5ba649347b5d7/83e6b7fd367b427088516a0fc7736e39","saturatedFat":14.9,"detailsLoaded":true},"tab-041a8cc0f2c5d431":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/041a8cc0f2c5d431/8bf957d7bf704cae9922aa9ea5c8184f","calcium":0,"saturatedFat":11.54,"detailsLoaded":true},"tab-b6bea4a6c2a2808b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b6bea4a6c2a2808b/56e8d594116d44dcbe4f6f552aed0e19","fiber":2.1,"saturatedFat":0,"salt":0.1,"sugars":2,"detailsLoaded":true},"tab-b72d3dc7383dd80b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b72d3dc7383dd80b/aa6218b5f73341b3944d9ca1088e263e","detailsLoaded":true},"tab-fc7ffbc31d376a9d":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/fc7ffbc31d376a9d/3685d8e6709a4c1893a69962274beb4f","fiber":2.1,"calcium":51,"saturatedFat":0.1,"salt":0.99,"sugars":1.5,"detailsLoaded":true},"tab-a22aab1f9a716a79":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/a22aab1f9a716a79/31b6d6fcb5cc4638a1f21dabae4e649e","fiber":1.7,"saturatedFat":0,"salt":0,"sugars":7.75,"detailsLoaded":true},"tab-cf5835de55a4b5da":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/cf5835de55a4b5da/286d784ec53d4cf3bb22bac22297717b","fiber":4.5,"calcium":10,"saturatedFat":0.04,"salt":0.01,"sugars":0.1,"detailsLoaded":true},"tab-b67af66bbda3d607":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b67af66bbda3d607/58a8f918c9f61dff","fiber":2.58,"calcium":36.53,"saturatedFat":0.09,"sugars":6.14,"detailsLoaded":true},"tab-732841a01cbfb0a2":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/732841a01cbfb0a2/8412f1e89eb8422bb92df3097787177f","fiber":3.3,"calcium":23,"saturatedFat":0.2,"salt":1,"sugars":1.6,"detailsLoaded":true},"tab-38f38d894bae73be":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/38f38d894bae73be/37a497b2e83e4ebf99f2e8e1a9e329fa","saturatedFat":0.12,"salt":0.4,"sugars":1.8,"detailsLoaded":true},"tab-9b44fc88f0061330":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/9b44fc88f0061330/127821af6cce493e864b83cbbdb102c4","fiber":2.4,"calcium":6,"saturatedFat":0.03,"salt":0,"sugars":9.96,"detailsLoaded":true},"tab-821fe5e9dee99063":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/821fe5e9dee99063/1e672ab45f34de40","fiber":1.7,"sugars":9,"detailsLoaded":true},"tab-33b5c4c7de2fcc00":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/33b5c4c7de2fcc00/e9b5f8ceec424d3aaf8a0462823b1587","fiber":2,"calcium":0.02,"saturatedFat":0,"salt":0.2,"sugars":4.7,"detailsLoaded":true},"tab-332f1202b2503553":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/332f1202b2503553/ff9787208f2d4293bc91b4c810c38605","calcium":90,"saturatedFat":0.4,"salt":0.05,"sugars":2.5,"detailsLoaded":true},"tab-eaca658914f64137b368002906e9b419":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/eaca658914f64137b368002906e9b419/92c3360442fe4582a28f1c61dbdda5be","fiber":2.1,"calcium":25,"saturatedFat":0.4,"salt":0.36,"sugars":1.6,"detailsLoaded":true},"tab-a41a2651a7fc413cbf3d9d1f610deb35":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/a41a2651a7fc413cbf3d9d1f610deb35/26505041fb2745b48c48618105d0cc4e","saturatedFat":5.1,"salt":0.7,"sugars":4.8,"detailsLoaded":true},"tab-68cb75d007161324":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/68cb75d007161324/ad29b3aeba3843e5929939b94eaa7ed7","fiber":0,"calcium":50,"saturatedFat":0.03,"salt":0.44,"sugars":0.6,"detailsLoaded":true},"tab-8f734954c3aea611":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/8f734954c3aea611/2cec99d39c3d4129a597087d458cda1b","fiber":7,"calcium":107,"saturatedFat":0.6,"salt":1,"sugars":5.7,"detailsLoaded":true},"tab-b1cc06e44b8344a08f814ba7c773b556":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b1cc06e44b8344a08f814ba7c773b556/95cce85954004c28841f325603f1313d","fiber":1.8,"saturatedFat":0,"salt":0,"sugars":9,"detailsLoaded":true},"tab-5d811f60989ea17b":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5d811f60989ea17b/445ef1619d3690b7","fiber":6,"calcium":40.56,"saturatedFat":0,"sugars":2.68,"detailsLoaded":true},"tab-359be6c7666ae6be":{"imageUrl":"https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/359be6c7666ae6be/3ab9a19f02354794a318697ffd6c9231","fiber":0,"calcium":0,"saturatedFat":0,"detailsLoaded":true}});
-for(const f of window.RATION_EXTENDED){const detail=window.RATION_PRODUCT_DETAILS[f.id];if(detail)Object.assign(f,detail);}
+Object.assign(window.RATION_PRODUCT_DETAILS, {
+  'tab-4eb84f318e0bd5b3': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/4eb84f318e0bd5b3/d23e64b6107faea0',
+    fiber: 0.69,
+    calcium: 0.01,
+    saturatedFat: 0,
+    sugars: 6,
+    detailsLoaded: true
+  },
+  'tab-989727f6053953b3': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5d8803c501c84addb2ba69a2effac35d/7c58d249dc994a50bba2b94cc9da3837',
+    fiber: 0,
+    saturatedFat: 17,
+    salt: 1.3,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-7f8d4878ec364bc9a6e8c3e0951250a1': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7f8d4878ec364bc9a6e8c3e0951250a1/032dc56f267d4a5ab7a6811a075e05a8',
+    detailsLoaded: true
+  },
+  'tab-5fbaf8a981330620': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/c4095ebfb96a4107a398f2fac3fcf23f/8a556ee3401a412d89f3bfceb2bc9fc2',
+    fiber: 1.6,
+    saturatedFat: 0.5,
+    salt: 0.1,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-6ff6ad6f78bc4ac1b6ec8029f70a0b18': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/6ff6ad6f78bc4ac1b6ec8029f70a0b18/89349af7e48b48118957f22953d8f76a',
+    fiber: 0,
+    calcium: 62,
+    saturatedFat: 4.32,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-04d68836c835b0e7': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/04d68836c835b0e7/20662821b6b145fa9055f5dca8f990b6',
+    fiber: 0,
+    calcium: 13,
+    saturatedFat: 0.9,
+    salt: 0.15,
+    sugars: 0,
+    detailsLoaded: true
+  },
+  'tab-2e461408a628918b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/2e461408a628918b/d59da919e0194d9f8841bca730a723f8',
+    fiber: 3.34,
+    calcium: 11.82,
+    saturatedFat: 0.05,
+    sugars: 10.29,
+    detailsLoaded: true
+  },
+  'tab-44bf4852d2acf296': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/44bf4852d2acf296/4dee52d9502543fcb1c22e11e783a437',
+    calcium: 24,
+    saturatedFat: 51,
+    salt: 0,
+    sugars: 1,
+    detailsLoaded: true
+  },
+  'tab-f84396c0502b4468': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/f84396c0502b4468/9ed9b158d69c4e28bfa5a8f0d992f294',
+    fiber: 6.4,
+    calcium: 28,
+    saturatedFat: 0.3,
+    salt: 1,
+    sugars: 2.1,
+    detailsLoaded: true
+  },
+  'tab-13fc72f4396fc7b2': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/13fc72f4396fc7b2/80e832e5807640d6bfde82acab34e437',
+    fiber: 1.2,
+    calcium: 10.6,
+    saturatedFat: 0.31,
+    salt: 0.41,
+    sugars: 0.2,
+    detailsLoaded: true
+  },
+  'tab-5680b261b63b56f0': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5680b261b63b56f0/6b8f0b73d0274f5a8c9099e38d03d40e',
+    fiber: 1.13,
+    saturatedFat: 2.88,
+    salt: 0.22,
+    sugars: 0.81,
+    detailsLoaded: true
+  },
+  'tab-ea6435123b76cd55': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/ea6435123b76cd55/7d24c80bd5794e76acd64c9ba0bf55c9',
+    detailsLoaded: true
+  },
+  'tab-e349dabc71d7da0c': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/e349dabc71d7da0c/c982583cea6f4df6961d7142b121748a',
+    fiber: 5.5,
+    calcium: 14.6,
+    saturatedFat: 2.77,
+    sugars: 0.5,
+    detailsLoaded: true
+  },
+  'tab-aa916f3d795d6a04': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/aa916f3d795d6a04/654e1fc20ea582c1',
+    fiber: 1.4,
+    calcium: 27,
+    saturatedFat: 0.04,
+    salt: 0.07,
+    detailsLoaded: true
+  },
+  'tab-d990f1757cd95b52': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/d990f1757cd95b52/dbb349279bd34bb087d4d706c342a272',
+    fiber: 0.9,
+    calcium: 19,
+    sugars: 0.11,
+    detailsLoaded: true
+  },
+  'tab-864db12a472e8f96': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/864db12a472e8f96/53fbb26da26f47ed8ca4428ffaf51e04',
+    fiber: 1.8,
+    calcium: 0,
+    saturatedFat: 0,
+    salt: 0,
+    sugars: 8,
+    detailsLoaded: true
+  },
+  'tab-7dce3c1d4ced9380': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7dce3c1d4ced9380/eb49c35ee1d04d289da0eaeb4719c832',
+    calcium: 60,
+    saturatedFat: 1.4,
+    salt: 0.05,
+    sugars: 3.3,
+    detailsLoaded: true
+  },
+  'tab-47986460d52546728ad28f7d5c6c1d04': {
+    calcium: 120,
+    saturatedFat: 1.5,
+    salt: 0.1,
+    sugars: 4.7,
+    detailsLoaded: true
+  },
+  'tab-7254cfc54d83413996206c5fd76c5ae2': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/7254cfc54d83413996206c5fd76c5ae2/22507501afb74e1982e4d90f51a2c0c5',
+    fiber: 1.6,
+    calcium: 8.57,
+    saturatedFat: 0.06,
+    sugars: 10,
+    detailsLoaded: true
+  },
+  'tab-b6b9f60d492060f4': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b6b9f60d492060f4/950c311d6345401dad445fdf6bc10222',
+    fiber: 3.8,
+    calcium: 18,
+    saturatedFat: 0.3,
+    salt: 1.12,
+    sugars: 0.47,
+    detailsLoaded: true
+  },
+  'tab-0377c2552b7b429e': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/0377c2552b7b429e/0788a366c43045319d24de35fc4495ec',
+    fiber: 0,
+    calcium: 50,
+    saturatedFat: 2.9,
+    salt: 0.75,
+    sugars: 0.5,
+    detailsLoaded: true
+  },
+  'tab-1ead41825beb3a85': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/1ead41825beb3a85/160b8d5ceab14fecb69383f82f9acd9b',
+    fiber: 1.5,
+    calcium: 6,
+    saturatedFat: 0,
+    sugars: 8.4,
+    detailsLoaded: true
+  },
+  'tab-69bab942084cac6f': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/69bab942084cac6f/7db2c604336a4dbe8b2e72aa7eed34ef',
+    calcium: 4.99,
+    saturatedFat: 0.01,
+    sugars: 80.13,
+    detailsLoaded: true
+  },
+  'tab-dd220a53d5d745178457a32910e432d5': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/dd220a53d5d745178457a32910e432d5/79ed5b91dcf248629cae5aa2eeb94756',
+    fiber: 1.3,
+    calcium: 7,
+    saturatedFat: 0.03,
+    salt: 0.01,
+    sugars: 2.5,
+    detailsLoaded: true
+  },
+  'tab-936fae1caea54587': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/936fae1caea54587/8b8319d0844648c88a7dad45c318731e',
+    fiber: 4,
+    calcium: 10,
+    sugars: 0.2,
+    detailsLoaded: true
+  },
+  'tab-6eac6ced7f64df6c': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/6eac6ced7f64df6c/577c580b86454497942bd769233dc019',
+    fiber: 0,
+    sugars: 4.7,
+    detailsLoaded: true
+  },
+  'tab-8984ee5c8b5d4e4d8998afd535bade56': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/8984ee5c8b5d4e4d8998afd535bade56/7a46b57b070241bf866e04ddd23c6b31',
+    fiber: 0,
+    calcium: 4,
+    saturatedFat: 0,
+    salt: 0,
+    sugars: 2.58,
+    detailsLoaded: true
+  },
+  'tab-02d5ba649347b5d7': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/02d5ba649347b5d7/83e6b7fd367b427088516a0fc7736e39',
+    saturatedFat: 14.9,
+    detailsLoaded: true
+  },
+  'tab-041a8cc0f2c5d431': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/041a8cc0f2c5d431/8bf957d7bf704cae9922aa9ea5c8184f',
+    calcium: 0,
+    saturatedFat: 11.54,
+    detailsLoaded: true
+  },
+  'tab-b6bea4a6c2a2808b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b6bea4a6c2a2808b/56e8d594116d44dcbe4f6f552aed0e19',
+    fiber: 2.1,
+    saturatedFat: 0,
+    salt: 0.1,
+    sugars: 2,
+    detailsLoaded: true
+  },
+  'tab-b72d3dc7383dd80b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b72d3dc7383dd80b/aa6218b5f73341b3944d9ca1088e263e',
+    detailsLoaded: true
+  },
+  'tab-fc7ffbc31d376a9d': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/fc7ffbc31d376a9d/3685d8e6709a4c1893a69962274beb4f',
+    fiber: 2.1,
+    calcium: 51,
+    saturatedFat: 0.1,
+    salt: 0.99,
+    sugars: 1.5,
+    detailsLoaded: true
+  },
+  'tab-a22aab1f9a716a79': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/a22aab1f9a716a79/31b6d6fcb5cc4638a1f21dabae4e649e',
+    fiber: 1.7,
+    saturatedFat: 0,
+    salt: 0,
+    sugars: 7.75,
+    detailsLoaded: true
+  },
+  'tab-cf5835de55a4b5da': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/cf5835de55a4b5da/286d784ec53d4cf3bb22bac22297717b',
+    fiber: 4.5,
+    calcium: 10,
+    saturatedFat: 0.04,
+    salt: 0.01,
+    sugars: 0.1,
+    detailsLoaded: true
+  },
+  'tab-b67af66bbda3d607': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b67af66bbda3d607/58a8f918c9f61dff',
+    fiber: 2.58,
+    calcium: 36.53,
+    saturatedFat: 0.09,
+    sugars: 6.14,
+    detailsLoaded: true
+  },
+  'tab-732841a01cbfb0a2': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/732841a01cbfb0a2/8412f1e89eb8422bb92df3097787177f',
+    fiber: 3.3,
+    calcium: 23,
+    saturatedFat: 0.2,
+    salt: 1,
+    sugars: 1.6,
+    detailsLoaded: true
+  },
+  'tab-38f38d894bae73be': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/38f38d894bae73be/37a497b2e83e4ebf99f2e8e1a9e329fa',
+    saturatedFat: 0.12,
+    salt: 0.4,
+    sugars: 1.8,
+    detailsLoaded: true
+  },
+  'tab-9b44fc88f0061330': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/9b44fc88f0061330/127821af6cce493e864b83cbbdb102c4',
+    fiber: 2.4,
+    calcium: 6,
+    saturatedFat: 0.03,
+    salt: 0,
+    sugars: 9.96,
+    detailsLoaded: true
+  },
+  'tab-821fe5e9dee99063': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/821fe5e9dee99063/1e672ab45f34de40',
+    fiber: 1.7,
+    sugars: 9,
+    detailsLoaded: true
+  },
+  'tab-33b5c4c7de2fcc00': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/33b5c4c7de2fcc00/e9b5f8ceec424d3aaf8a0462823b1587',
+    fiber: 2,
+    calcium: 0.02,
+    saturatedFat: 0,
+    salt: 0.2,
+    sugars: 4.7,
+    detailsLoaded: true
+  },
+  'tab-332f1202b2503553': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/332f1202b2503553/ff9787208f2d4293bc91b4c810c38605',
+    calcium: 90,
+    saturatedFat: 0.4,
+    salt: 0.05,
+    sugars: 2.5,
+    detailsLoaded: true
+  },
+  'tab-eaca658914f64137b368002906e9b419': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/eaca658914f64137b368002906e9b419/92c3360442fe4582a28f1c61dbdda5be',
+    fiber: 2.1,
+    calcium: 25,
+    saturatedFat: 0.4,
+    salt: 0.36,
+    sugars: 1.6,
+    detailsLoaded: true
+  },
+  'tab-a41a2651a7fc413cbf3d9d1f610deb35': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/a41a2651a7fc413cbf3d9d1f610deb35/26505041fb2745b48c48618105d0cc4e',
+    saturatedFat: 5.1,
+    salt: 0.7,
+    sugars: 4.8,
+    detailsLoaded: true
+  },
+  'tab-68cb75d007161324': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/68cb75d007161324/ad29b3aeba3843e5929939b94eaa7ed7',
+    fiber: 0,
+    calcium: 50,
+    saturatedFat: 0.03,
+    salt: 0.44,
+    sugars: 0.6,
+    detailsLoaded: true
+  },
+  'tab-8f734954c3aea611': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/8f734954c3aea611/2cec99d39c3d4129a597087d458cda1b',
+    fiber: 7,
+    calcium: 107,
+    saturatedFat: 0.6,
+    salt: 1,
+    sugars: 5.7,
+    detailsLoaded: true
+  },
+  'tab-b1cc06e44b8344a08f814ba7c773b556': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/b1cc06e44b8344a08f814ba7c773b556/95cce85954004c28841f325603f1313d',
+    fiber: 1.8,
+    saturatedFat: 0,
+    salt: 0,
+    sugars: 9,
+    detailsLoaded: true
+  },
+  'tab-5d811f60989ea17b': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/5d811f60989ea17b/445ef1619d3690b7',
+    fiber: 6,
+    calcium: 40.56,
+    saturatedFat: 0,
+    sugars: 2.68,
+    detailsLoaded: true
+  },
+  'tab-359be6c7666ae6be': {
+    imageUrl:
+      'https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/359be6c7666ae6be/3ab9a19f02354794a318697ffd6c9231',
+    fiber: 0,
+    calcium: 0,
+    saturatedFat: 0,
+    detailsLoaded: true
+  }
+});
+for (const f of window.RATION_EXTENDED) {
+  const detail = window.RATION_PRODUCT_DETAILS[f.id];
+  if (detail) Object.assign(f, detail);
+}

@@ -1,0 +1,16 @@
+{
+  "name": "mii-ratsion",
+  "version": "2.3.0",
+  "private": true,
+  "description": "Multilingual, browser-local nutrition diary",
+  "scripts": {
+    "start": "node server.mjs",
+    "build": "node build-single.mjs",
+    "test": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs",
+    "test:http": "node tests/server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,346 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs'),
+  vm = require('node:vm'),
+  C = require('../core.js');
+const N = require('../nutrition.js'),
+  P = require('../providers.js');
+let checks = 0;
+function test(name, fn) {
+  fn();
+  checks++;
+  console.log('PASS ' + name);
+}
+const rootDir = require('node:path').resolve(__dirname, '..');
+const year = new Date().getFullYear(),
+  profile = {
+    birthYear: year - 30,
+    sex: 'male',
+    height: 180,
+    weight: 80,
+    activity: 0,
+    goal: 'maintain',
+    special: false
+  };
+const sandbox = { window: { RationCore: C, RationNutrition: N } };
+for (const file of [
+  'data.js',
+  'strings.js',
+  'catalog.js',
+  'product-assets.js',
+  'product-photos.js',
+  'search.js'
+])
+  vm.runInNewContext(fs.readFileSync(rootDir + '/' + file, 'utf8'), sandbox);
+const foods = [...sandbox.window.RATION_FOODS, ...sandbox.window.RATION_EXTENDED];
+test('Adult Mifflin–St Jeor and activity factor', () => {
+  const n = C.calculate(profile);
+  assert.equal(n.bmr, 1780);
+  assert.equal(n.tdee, 2136);
+  assert.equal(n.kcal, 2140);
+});
+test('Female equation', () => assert.equal(C.calculate({ ...profile, sex: 'female' }).bmr, 1614));
+test('Loss and gain follow chosen goal', () => {
+  assert(C.calculate({ ...profile, goal: 'lose' }).kcal < C.calculate(profile).kcal);
+  assert(C.calculate({ ...profile, goal: 'gain' }).kcal > C.calculate(profile).kcal);
+});
+test('Birth-year calculation uses the requested age floor', () => {
+  assert.equal(
+    C.calculate({ ...profile, birthYear: year - 16 }).kcal,
+    C.calculate({ ...profile, birthYear: year - 18 }).kcal
+  );
+  assert.equal(C.calculate({ ...profile, special: true }).p, null);
+});
+test('Low BMI does not trigger automatic deficit', () => {
+  const p = { ...profile, weight: 50, goal: 'lose' };
+  assert.equal(C.calculate(p).kcal, C.calculate({ ...p, goal: 'maintain' }).kcal);
+});
+test('Reject impossible and nonfinite profile values', () => {
+  assert(!C.validProfile({ ...profile, weight: NaN }));
+  assert(!C.validProfile({ ...profile, birthYear: year + 1 }));
+  assert(!C.validProfile({ ...profile, height: 900 }));
+});
+test('Macro energy stays near target after rounding', () => {
+  const n = C.calculate(profile);
+  assert(Math.abs(n.p * 4 + n.f * 9 + n.c * 4 - n.kcal) <= 10);
+});
+test('Portions aggregate across meals', () => {
+  const total = C.total([
+    { food: { kcal: 100, p: 10, f: 4, c: 6 }, grams: 150 },
+    { food: { kcal: 200, p: 2, f: 8, c: 30 }, grams: 50 }
+  ]);
+  assert.equal(total.kcal, 250);
+  assert.equal(total.p, 16);
+});
+test('All 8931 catalog entries have valid numerical data', () =>
+  assert(foods.length === 8931 && foods.every(C.validFood)));
+test('Ukrainian typo, Russian synonym and English typo search', () => {
+  assert(C.search(foods, 'банн').some((f) => f.names[2] === 'Banana'));
+  assert(C.search(foods, 'овсянка').some((f) => f.names[2].includes('oats')));
+  assert(C.search(foods, 'chiken').some((f) => f.names[2].includes('Chicken')));
+});
+test('Dry and cooked rice remain separate', () =>
+  assert(
+    C.search(sandbox.window.RATION_FOODS, 'rice').filter((f) => f.names[2].includes('White rice'))
+      .length === 2
+  ));
+test('Dates handle invalid calendar values', () => {
+  assert(C.validDate('2024-02-29'));
+  assert(!C.validDate('2026-02-29'));
+  assert(!C.validDate('2026-13-01'));
+});
+test('Backup roundtrip preserves snapshots', () => {
+  const s = C.defaults();
+  s.profile = profile;
+  s.targets = C.calculate(profile);
+  s.days['2026-11-14'] = {
+    entries: [{ id: 'entry', food: foods[0], grams: 125, meal: 2 }],
+    water: [250, 150]
+  };
+  assert(C.validState(JSON.parse(JSON.stringify(s))));
+});
+test('Import rejects malformed foods, dates and water', () => {
+  const s = C.defaults();
+  s.days['2026-11-14'] = {
+    entries: [{ id: 'x', grams: 100, meal: 1, food: { names: ['bad'] } }],
+    water: []
+  };
+  assert(!C.validState(s));
+  s.days = { 'bad-date': { entries: [], water: [] } };
+  assert(!C.validState(s));
+  s.days = { '2026-11-14': { entries: [], water: [-500] } };
+  assert(!C.validState(s));
+});
+test('All interface messages have 3 translations', () =>
+  assert(
+    Object.values(sandbox.window.RATION_TEXT).every(
+      (v) => v.length === 3 && v.every((x) => typeof x === 'string' && x.length)
+    )
+  ));
+test('All literal translation keys exist', () => {
+  const code = fs.readFileSync(rootDir + '/app.js', 'utf8');
+  for (const m of code.matchAll(/\bt\('([^']+)'\)/g))
+    assert(m[1] in sandbox.window.RATION_TEXT, 'Missing translation: ' + m[1]);
+});
+test('Standalone HTML scripts parse and embed photographs', () => {
+  const html = fs.readFileSync(rootDir + '/Mii_Ratsion.html', 'utf8');
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  assert.equal(scripts.length, 13);
+  for (const [, script] of scripts) new vm.Script(script);
+  assert(html.includes('data:image/jpeg;base64,'));
+  assert(!html.includes('<link rel="stylesheet"'));
+});
+test('Legacy profile migration retains diary and removes the name', () => {
+  const old = {
+    ...C.defaults(),
+    version: 1,
+    profile: {
+      name: 'Test',
+      age: 30,
+      sex: 'male',
+      height: 180,
+      weight: 80,
+      activity: 0,
+      goal: 'maintain',
+      special: false
+    }
+  };
+  old.days['2026-11-14'] = {
+    entries: [{ id: 'e', food: foods[0], grams: 125, meal: 1 }],
+    water: [250]
+  };
+  const migrated = C.migrate(old);
+  assert.equal(migrated.profile.birthYear, year - 30);
+  assert(!('name' in migrated.profile));
+  assert.equal(migrated.days['2026-11-14'].entries[0].grams, 125);
+  assert.equal(migrated.days['2026-11-14'].water[0], 250);
+});
+test('CSV importer accepts quoted names and decimal commas', () => {
+  const rows = C.importFoods('Назва;ккал;Білки;Жири;Вуглеводи\n"Сир, м’який";"100,5";5;2;15\n');
+  assert.equal(rows[0].kcal, 100.5);
+  assert.equal(rows[0].p, 5);
+});
+test('CSV importer rejects missing and negative values', () => {
+  assert.throws(() => C.importFoods('name,kcal,p,f,c\nBad,100,,5,20'));
+  assert.throws(() => C.importFoods('name,kcal,p,f,c\nBad,-100,5,5,20'));
+});
+test('Unsafe source links cannot enter a backup', () =>
+  assert(!C.validFood({ ...foods[0], sourceUrl: 'javascript:alert(1)' })));
+test('Nutrient reference defaults and migration preserve manual values', () => {
+  assert.equal(C.defaults().extraTargets.sugars, 90);
+  const s = C.defaults();
+  s.extraTargets.salt = 4;
+  assert.equal(C.migrate(s).extraTargets.salt, 4);
+  delete s.extraTargets;
+  assert.equal(C.migrate(s).extraTargets.fiber, 25);
+});
+test('Macro energy distribution sums to 100%', () => {
+  const d = N.distribution({ p: 5, f: 35, c: 56 });
+  assert.equal(d.total, 559);
+  assert(Math.abs(d.p + d.f + d.c - 100) < 0.000001);
+  assert.equal(N.distribution({ p: 0, f: 0, c: 0 }).p, 0);
+});
+test('Percentages use selected portion and avoid zero division', () => {
+  assert.equal(N.percent(559, 2000), 27.950000000000003);
+  assert(Math.abs(N.percent(559 * 0.25, 2000) - 6.9875) < 0.00001);
+  assert.equal(N.percent(0, 0), null);
+  assert.equal(N.percent(null, 25), null);
+});
+test('Progress and reference colour bands are distinct', () => {
+  assert.equal(N.tone(10, 100), 'yellow');
+  assert.equal(N.tone(60, 100), 'green');
+  assert.equal(N.tone(110, 100), 'orange');
+  assert.equal(N.tone(130, 100), 'red');
+  assert.equal(N.tone(30, 100, 'reference'), 'green');
+  assert.equal(N.tone(60, 100, 'reference'), 'yellow');
+  assert.equal(N.tone(90, 100, 'reference'), 'orange');
+  assert.equal(N.tone(110, 100, 'reference'), 'red');
+  assert.equal(N.tone(150, 100, 'minimum'), 'green');
+});
+test('Missing nutrient coverage is never silently counted as zero', () => {
+  const entries = [
+    { grams: 100, food: { sugars: 10 } },
+    { grams: 50, food: {} }
+  ];
+  const d = N.total(entries, 'sugars');
+  assert.equal(d.value, 10);
+  assert.equal(d.complete, false);
+  assert.equal(d.known, 1);
+  assert.equal(N.tone(d.value, 90, 'reference', d.complete), 'neutral');
+});
+test('OFF parsing preserves zero, images and sodium conversion', () => {
+  const f = P.fromOFF({
+    code: '12345678',
+    product_name: 'Test',
+    image_front_url: 'https://images.openfoodfacts.org/images/test.jpg',
+    nutriments: {
+      'energy-kcal_100g': 100,
+      proteins_100g: 1,
+      fat_100g: 1,
+      carbohydrates_100g: 20,
+      sugars_100g: 0,
+      sodium_100g: 0.1,
+      calcium_100g: 0.1
+    }
+  });
+  assert.equal(f.sugars, 0);
+  assert.equal(f.salt, 0.25);
+  assert.equal(f.calcium, 100);
+  assert(f.imageUrl);
+  assert.equal(f.fiber, undefined);
+});
+test('Table details keep quantities and units', () => {
+  const html =
+    '<meta property="og:image" content="https://www.tablycjakalorijnosti.com.ua/file/image/foodstuff/test/photo"><script type="application/ld+json">' +
+    JSON.stringify({
+      keywords: ['Цукор : 19 г', 'Сіль : 0 г', 'Волокна : 2 г', 'Кальцій : 12 мг']
+    }) +
+    '</script>';
+  const d = P.tableDetails(html);
+  assert.equal(d.sugars, 19);
+  assert.equal(d.salt, 0);
+  assert.equal(d.calcium, 12);
+  assert(d.imageUrl);
+  assert.equal(d.iron, undefined);
+});
+test('Untrusted image origins and invalid nutrients are rejected', () => {
+  assert(!C.validFood({ ...foods[0], imageUrl: 'https://evil.example/track' }));
+  assert(!C.validFood({ ...foods[0], sugars: -1 }));
+  assert(!C.validFood({ ...foods[0], fiber: NaN }));
+});
+test('Incomplete OFF water retains identity, photo and missing macros', () => {
+  const f = P.fromOFF({
+    code: '4820051240233',
+    product_name: 'Spring water',
+    categories_tags: ['en:waters', 'en:mineral-waters'],
+    image_front_url: 'https://images.openfoodfacts.org/images/water.jpg',
+    nutriments: {}
+  });
+  assert(f && C.validCatalogFood(f));
+  assert(!C.validFood(f));
+  for (const k of ['kcal', 'p', 'f', 'c']) assert.equal(f[k], null);
+  assert(f.plainWaterCandidate);
+  assert(f.imageUrl);
+  assert.equal(f.barcode, '4820051240233');
+});
+test('Flavoured water does not receive a plain-water shortcut', () => {
+  const f = P.fromOFF({
+    code: '12345678',
+    product_name: 'Lemon water',
+    categories_tags: ['en:waters', 'en:flavoured-waters'],
+    nutriments: {}
+  });
+  assert.equal(f.plainWaterCandidate, false);
+});
+test('Invalid macro input stays unknown while real zero is preserved', () => {
+  const f = P.fromOFF({
+    code: '12345678',
+    product_name: 'Partial',
+    nutriments: {
+      'energy-kcal_100g': '',
+      proteins_100g: 0,
+      fat_100g: -1,
+      carbohydrates_100g: 'bad'
+    }
+  });
+  assert.equal(f.kcal, null);
+  assert.equal(f.p, 0);
+  assert.equal(f.f, null);
+  assert.equal(f.c, null);
+});
+test('GTIN matching retains leading-zero equivalents only', () => {
+  assert.equal(C.barcodeKey('04820051240233'), C.barcodeKey('4820051240233'));
+  assert.deepEqual(C.barcodeCandidates('012345678905'), ['012345678905', '0012345678905']);
+  assert.deepEqual(C.barcodeCandidates('4820051240233'), ['4820051240233']);
+  assert.equal(C.barcodeKey('bad'), null);
+});
+test('Incomplete catalog records cannot enter diary or backups', () => {
+  const water = sandbox.window.RATION_BARCODE_CATALOG[0];
+  assert(C.validCatalogFood(water));
+  const s = C.defaults();
+  s.customFoods = [water];
+  assert(!C.validState(s));
+});
+test('Mobile controls use 16px without disabling intentional zoom', () => {
+  const css = fs.readFileSync(rootDir + '/styles.css', 'utf8'),
+    html = fs.readFileSync(rootDir + '/index.html', 'utf8');
+  assert(/@media\s*\(max-width:\s*900px\)/.test(css));
+  assert(/font-size:\s*16px\s*!important/.test(css));
+  assert(!/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/.test(html));
+  const single = fs.readFileSync(rootDir + '/Mii_Ratsion.html', 'utf8');
+  assert(!single.includes('assets/products/water-4820051240233.jpg'));
+});
+test('Source photos cover 966 of the 1000 table products', () => {
+  const table = foods.filter((food) => food.source === 'tablycja');
+  assert.equal(table.length, 1000);
+  assert.equal(table.filter((food) => food.imageUrl).length, 966);
+  assert.equal(Object.keys(sandbox.window.RATION_SOURCE_PHOTOS).length, 966);
+});
+test('Malformed source records do not discard a whole search response', () => {
+  assert.equal(P.fromOFF(null), null);
+  assert.equal(P.fromTable(null), null);
+  assert.equal(P.fromTable({ title: 'missing id' }), null);
+  const food = P.fromOFF({
+    code: '12345678',
+    product_name: 'Test',
+    nutriments: {
+      'energy-kcal_100g': 100,
+      proteins_100g: 2,
+      fat_100g: 1,
+      carbohydrates_100g: 20,
+      sugars_100g: 999,
+      sodium_100g: 'bad'
+    }
+  });
+  assert(C.validFood(food));
+  assert.equal(food.sugars, undefined);
+  assert.equal(food.salt, undefined);
+});
+test('Safe-area layout covers top, bottom and landscape edges', () => {
+  const css = fs.readFileSync(rootDir + '/styles.css', 'utf8');
+  for (const edge of ['top', 'bottom', 'left', 'right'])
+    assert(css.includes('safe-area-inset-' + edge));
+  assert(/height:\s*calc\(68px \+ var\(--safe-top\)\)/.test(css));
+  const html = fs.readFileSync(rootDir + '/index.html', 'utf8');
+  assert(html.includes('icon-v2-3-180.png'));
+});
+console.log(checks + ' checks passed; ' + foods.length + ' complete local foods.');
