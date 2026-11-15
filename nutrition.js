@@ -58,7 +58,7 @@
   C.validFood = (f) =>
     oldValid(f) &&
     extras.every((k) => f[k] == null || (known(f[k]) && f[k] <= 100)) &&
-    ['calcium', 'iron', 'potassium', 'vitaminC'].every(
+    ['calcium', 'iron', 'potassium', 'vitaminC', 'sodium'].every(
       (k) => f[k] == null || (known(f[k]) && f[k] <= 100000)
     ) &&
     (!f.imageUrl || safeImage(f.imageUrl)) &&

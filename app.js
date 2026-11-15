@@ -200,7 +200,7 @@
     const days = Array.from({ length: 7 }, (_, index) =>
       C.shiftDate(selectedDate, index - weekday)
     );
-    return `<div class="diary-heading"><div><p class="eyebrow">${formatDate(selectedDate, { month: 'long', year: 'numeric' })}</p><h1>${selectedDate === C.dateKey() ? t('todayTitle') : formatDate(selectedDate, { day: 'numeric', month: 'long' })}</h1></div>${dateControls()}</div><div class="day-strip">${days.map((key) => action('select-day', '', null, 'day-chip' + (key === selectedDate ? ' selected' : ''), `data-date="${key}" aria-label="${esc(formatDate(key, { day: 'numeric', month: 'long' }))}" aria-pressed="${key === selectedDate}"`).replace('</button>', `<span>${formatDate(key, { weekday: 'short' })}</span><strong>${Number(key.slice(8))}</strong><i class="${day(key).entries.length ? 'has-records' : ''}"></i></button>`)).join('')}</div><section class="panel summary"><div class="calorie-overview"><div><p class="nutrition-overline">${t('eaten')}</p><div class="calorie-total"><strong>${fmt(total.kcal)}</strong><span>${t('kcal')}</span></div></div><div class="calorie-remaining"><strong>${remaining == null ? '—' : fmt(Math.abs(remaining))}</strong><span>${remaining == null ? t('noTarget') : t(remaining >= 0 ? 'leftToday' : 'overToday')}</span></div></div><div class="budget-track"><span style="width:${pct}%"></span></div><div class="budget-caption"><span>${t('dailyBudget')}</span><strong>${target == null ? '—' : fmt(target) + ' ' + t('kcal')}</strong></div>${dailyMacroHTML(total)}<details class="nutrient-details" id="daily-nutrients" ${state.settings.extrasOpen ? 'open' : ''}><summary><span>${t('extraNutrients')}</span>${icon('chevron')}</summary>${dailyExtrasHTML()}</details></section><div class="section-heading"><h2>${t('diary')}</h2><span>${entries.length} ${t('items')}</span></div><div class="dashboard-grid"><div class="meal-list">${Array.from({ length: 5 }, (_, index) => mealHTML(index)).join('')}</div><aside class="right-column"><section class="panel water-panel"><div class="between"><div class="water-title">${icon('drop')}<h2>${t('waterShort')}</h2></div><span>${fmt(water)} <small>/ ${fmt(wg)} ${t('ml')}</small></span></div><div class="track water-track"><span style="width:${wg ? Math.min(100, (water / wg) * 100) : 0}%"></span></div><div class="water-actions">${[150, 250, 500].map((value) => action('water', '+' + value + ' ' + t('ml'), null, 'btn secondary', `data-value="${value}"`)).join('')}</div>${action('water-undo', t('undo'), null, 'water-undo', day().water.length ? '' : 'disabled')}</section><section class="panel quick-tools"><h2>${t('myKitchen')}</h2>${action('show-recipes', t('recipes'), 'food', 'quick-action')}${action('nav', t('favorites'), 'star', 'quick-action', 'data-page="foods" data-filter="favorites"')}${action('log-weight', t('logWeight'), 'weight', 'quick-action')}</section></aside></div>`;
+    return `<div class="diary-heading"><div><p class="eyebrow">${formatDate(selectedDate, { month: 'long', year: 'numeric' })}</p><h1>${selectedDate === C.dateKey() ? t('todayTitle') : formatDate(selectedDate, { day: 'numeric', month: 'long' })}</h1></div>${dateControls()}</div><div class="day-strip">${days.map((key) => action('select-day', '', null, 'day-chip' + (key === selectedDate ? ' selected' : ''), `data-date="${key}" aria-label="${esc(formatDate(key, { day: 'numeric', month: 'long' }))}" aria-pressed="${key === selectedDate}"`).replace('</button>', `<span>${formatDate(key, { weekday: 'short' })}</span><strong>${Number(key.slice(8))}</strong><i class="${day(key).entries.length ? 'has-records' : ''}"></i></button>`)).join('')}</div><section class="panel summary"><div class="calorie-overview"><div><p class="nutrition-overline">${t('eaten')}</p><div class="calorie-total"><strong>${fmt(total.kcal)}</strong><span>${t('kcal')}</span></div></div><div class="calorie-remaining"><strong>${remaining == null ? '—' : fmt(Math.abs(remaining))}</strong><span>${remaining == null ? t('noTarget') : t(remaining >= 0 ? 'leftToday' : 'overToday')}</span></div></div><div class="budget-track"><span style="width:${pct}%"></span></div><div class="budget-caption"><span>${t('dailyBudget')}</span><strong>${target == null ? '—' : fmt(target) + ' ' + t('kcal')}</strong></div>${dailyMacroHTML(total)}<details class="nutrient-details" id="daily-nutrients" ${state.settings.extrasOpen ? 'open' : ''}><summary><span>${t('extraNutrients')}</span>${icon('chevron')}</summary>${dailyExtrasHTML()}</details></section><div class="section-heading"><h2>${t('diary')}</h2><span>${entries.length} ${t(entries.length % 10 === 1 && entries.length % 100 !== 11 ? 'entryOne' : [2, 3, 4].includes(entries.length % 10) && ![12, 13, 14].includes(entries.length % 100) ? 'entryFew' : 'entryMany')}</span></div><div class="dashboard-grid"><div class="meal-list">${Array.from({ length: 5 }, (_, index) => mealHTML(index)).join('')}</div><aside class="right-column"><section class="panel water-panel"><div class="between"><div class="water-title">${icon('drop')}<h2>${t('waterShort')}</h2></div><span>${fmt(water)} <small>/ ${fmt(wg)} ${t('ml')}</small></span></div><div class="track water-track"><span style="width:${wg ? Math.min(100, (water / wg) * 100) : 0}%"></span></div><div class="water-actions">${[150, 250, 500].map((value) => action('water', '+' + value + ' ' + t('ml'), null, 'btn secondary', `data-value="${value}"`)).join('')}</div>${action('water-undo', t('undo'), null, 'water-undo', day().water.length ? '' : 'disabled')}</section><section class="panel quick-tools"><h2>${t('myKitchen')}</h2>${action('show-recipes', t('recipes'), 'food', 'quick-action')}${action('nav', t('favorites'), 'star', 'quick-action', 'data-page="foods" data-filter="favorites"')}${action('log-weight', t('logWeight'), 'weight', 'quick-action')}</section></aside></div>`;
   }
   function mealHTML(index) {
     const rows = day().entries.filter((entry) => entry.meal === index),
@@ -227,6 +227,7 @@
     addSearch = null;
   function selectedFoods(s) {
     let list = foodList();
+    if (s.filter === 'basics') list = list.filter(C.isBasicFood);
     if (s.filter === 'favorites') list = list.filter((f) => state.favorites.includes(f.id));
     if (FUI.isPicking()) list = list.filter((food) => food.kind !== 'recipe');
     if (s.filter === 'custom')
@@ -250,15 +251,15 @@
       : local;
   }
   function searchToolbar(s, mode) {
-    return `<div class="search-line"><div class="searchbox">${icon('search')}<input id="${mode === 'catalog' ? 'catalog-search' : 'add-search'}" type="search" autocomplete="off" placeholder="${t('search')}" aria-label="${t('search')}" value="${esc(s.q)}"></div>${ib('scan', 'scan', t('scan'))}${ib('create-food', 'plus', t('createFood'))}</div><div class="search-filters">${['all', 'recent', 'favorites', 'custom'].map((f) => action('search-filter', t(f), f === 'favorites' ? 'star' : null, 'filter' + (s.filter === f ? ' active' : ''), `data-filter="${f}" data-mode="${mode}" aria-pressed="${s.filter === f}"`)).join('')}<select id="${mode}-category" aria-label="${t('category')}"><option value="all">${t('category')}</option>${['grain', 'protein', 'veg', 'fruit', 'dairy', 'fat', 'drink', 'other'].map((c) => `<option value="${c}" ${s.category === c ? 'selected' : ''}>${t(c === 'protein' ? 'proteinCat' : c === 'fat' ? 'fatCat' : c)}</option>`).join('')}</select></div>`;
+    return `<div class="search-line"><div class="searchbox">${icon('search')}<input id="${mode === 'catalog' ? 'catalog-search' : 'add-search'}" type="search" autocomplete="off" placeholder="${t('search')}" aria-label="${t('search')}" value="${esc(s.q)}"></div>${ib('scan', 'scan', t('scan'))}${ib('create-food', 'plus', t('createFood'))}</div><div class="search-filters">${['all', 'basics', 'recent', 'favorites', 'custom'].map((f) => action('search-filter', t(f), f === 'favorites' ? 'star' : f === 'basics' ? 'leaf' : null, 'filter' + (s.filter === f ? ' active' : ''), `data-filter="${f}" data-mode="${mode}" aria-pressed="${s.filter === f}"`)).join('')}<select id="${mode}-category" aria-label="${t('category')}"><option value="all">${t('category')}</option>${['grain', 'protein', 'veg', 'fruit', 'dairy', 'fat', 'drink', 'other'].map((c) => `<option value="${c}" ${s.category === c ? 'selected' : ''}>${t(c === 'protein' ? 'proteinCat' : c === 'fat' ? 'fatCat' : c)}</option>`).join('')}</select></div>`;
   }
   function foodRow(f) {
     const chosen = state.favorites.includes(f.id);
-    return `<article class="food-row" data-food-id="${esc(f.id)}">${photoHTML(f)}<button class="food-result-main" data-action="portion" data-id="${esc(f.id)}"><strong>${esc(name(f))}</strong><small>${f.brand ? esc(f.brand) + ' · ' : ''}${C.validFood(f) ? fmt(f.kcal) + ' ' + t('kcal') + ' · ' + t('pShort') + ' ' + fmt(f.p, 1) + ' · ' + t('fShort') + ' ' + fmt(f.f, 1) + ' · ' + t('cShort') + ' ' + fmt(f.c, 1) : t('nutritionMissing')} <span class="result-source">${esc(sourceName(f))}</span></small></button>${action('favorite', '', 'star', 'icon-btn favorite' + (chosen ? ' chosen' : ''), `data-id="${esc(f.id)}" aria-label="${t(chosen ? 'favoriteRemove' : 'favoriteAdd')}" aria-pressed="${chosen}"`)}${action('portion', '', 'plus', 'meal-add', `data-id="${esc(f.id)}" aria-label="${esc(t('addFood') + ' · ' + name(f))}"`)}</article>`;
+    return `<article class="food-row" data-food-id="${esc(f.id)}">${photoHTML(f)}<button class="food-result-main" data-action="portion" data-id="${esc(f.id)}"><strong>${esc(name(f))}${C.isBasicFood(f) ? `<span class="basic-leaf" title="${t('basicIngredient')}" aria-label="${t('basicIngredient')}">${icon('leaf')}</span>` : ''}</strong><small>${f.brand ? esc(f.brand) + ' · ' : ''}${C.validFood(f) ? fmt(f.kcal) + ' ' + t('kcal') + ' · ' + t('pShort') + ' ' + fmt(f.p, 1) + ' · ' + t('fShort') + ' ' + fmt(f.f, 1) + ' · ' + t('cShort') + ' ' + fmt(f.c, 1) : t('nutritionMissing')} <span class="result-source">${esc(sourceName(f))}</span></small></button>${action('favorite', '', 'star', 'icon-btn favorite' + (chosen ? ' chosen' : ''), `data-id="${esc(f.id)}" aria-label="${t(chosen ? 'favoriteRemove' : 'favoriteAdd')}" aria-pressed="${chosen}"`)}${action('portion', '', 'plus', 'meal-add', `data-id="${esc(f.id)}" aria-label="${esc(t('addFood') + ' · ' + name(f))}"`)}</article>`;
   }
   function searchResults(s, mode) {
     const list = mergedFoods(s);
-    return `<div class="results-meta"><span>${fmt(list.length)} ${t('results')} · ${t('per100Any')}</span><span role="status">${s.busy ? '<i class="load-spinner"></i> ' + t('loading') : s.error ? t('searchUnavailable') : ''}</span></div><div class="food-list">${list.slice(0, s.shown).map(foodRow).join('') || `<div class="empty">${s.busy ? t('loading') : t('noResults')}</div>`}</div>${list.length > s.shown ? action('more', t('showMore') + ' (' + fmt(list.length - s.shown) + ')', null, 'btn secondary full gap-top', `data-mode="${mode}"`) : ''}`;
+    return `${s.filter === 'basics' ? `<p class="basics-note">${icon('leaf')}${t('basicsNote')}</p>` : ''}<div class="results-meta"><span>${fmt(list.length)} ${t(list.length % 10 === 1 && list.length % 100 !== 11 ? 'resultOne' : [2, 3, 4].includes(list.length % 10) && ![12, 13, 14].includes(list.length % 100) ? 'resultFew' : 'resultMany')} · ${t('per100Any')}</span><span role="status">${s.busy ? '<i class="load-spinner"></i> ' + t('loading') : s.error ? t('searchUnavailable') : ''}</span></div><div class="food-list">${list.slice(0, s.shown).map(foodRow).join('') || `<div class="empty">${s.busy ? t('loading') : t('noResults')}</div>`}</div><div class="missing-food"><div><strong>${t('missingFood')}</strong><small>${t('addFromLabel')}</small></div>${action('create-from-label', t('add'), 'camera', 'btn secondary')}</div>${list.length > s.shown ? action('more', t('showMore') + ' (' + fmt(list.length - s.shown) + ')', null, 'btn secondary full gap-top', `data-mode="${mode}"`) : ''}`;
   }
   function catalogHTML() {
     return `${header(t('foods'), fmt(foodList().length) + ' ' + t('inCatalog'), action('import-catalog', '', 'upload', 'icon-btn', `aria-label="${t('importCatalog')}"`))}<div class="page-tabs">${action('show-foods', t('foods'), null, 'tab active')}${action('show-recipes', t('recipes'), null, 'tab')}</div>${searchToolbar(catalog, 'catalog')}<div id="catalog-results">${searchResults(catalog, 'catalog')}</div>`;
@@ -406,7 +407,7 @@
     app.innerHTML = `<div class="onboarding"><aside class="onboard-art"><div class="art-content">${brand()}<h1>${t('setupTitle')}</h1></div></aside><main class="onboard-main" id="main"><div class="onboard-lang">${['uk', 'ru', 'en'].map((l) => action('lang', l.toUpperCase(), null, 'lang-btn' + (l === state.lang ? ' active' : ''), `data-lang="${l}"`)).join('')}</div><div class="onboard-form"><h2>${t('profile')}</h2><form id="setup-form" class="gap-top">${profileFields({ birthYear: null, sex: 'female', height: 170, weight: 65, activity: 1, goal: 'maintain', special: false })}<button class="btn full gap-top" type="submit">${t('begin')}${icon('arrow')}</button></form><p class="setup-privacy">${icon('lock')}${t('deviceStorage')}</p></div></main></div>`;
   }
   function settingsHTML() {
-    return `${header(t('settings'))}<div class="settings-layout"><section class="panel settings-panel"><h2>${t('profile')}</h2><form id="edit-profile-form" class="gap-top">${profileFields(state.profile)}<button class="btn gap-top" type="submit">${t('saveProfile')}</button></form></section><section class="panel settings-panel" id="target-settings"><div class="between"><h2>${t('targets')}</h2>${ib('recalculate', 'activity', t('restoreAuto'))}</div><form id="targets-form" class="gap-top"><div class="settings-grid">${[
+    return `${header(t('settings'))}${FUI.localProfileHTML()}<div class="settings-layout"><section class="panel settings-panel"><h2>${t('nutritionParameters')}</h2><form id="edit-profile-form" class="gap-top">${profileFields(state.profile)}<button class="btn gap-top" type="submit">${t('saveProfile')}</button></form></section><section class="panel settings-panel" id="target-settings"><div class="between"><h2>${t('targets')}</h2>${ib('recalculate', 'activity', t('restoreAuto'))}</div><form id="targets-form" class="gap-top"><div class="settings-grid">${[
       ['kcal', 'kcal', 10000],
       ['p', 'protein', 1000],
       ['f', 'fat', 1000],
@@ -434,7 +435,7 @@
       )
       .join(
         ''
-      )}</section><section class="panel settings-panel"><h2>${t('data')}</h2><div class="data-buttons">${action('export', t('export'), 'download', 'btn secondary')}<label class="btn secondary file-label">${icon('upload')}${t('import')}<input id="import-file" type="file" accept="application/json,.json"></label>${action('import-catalog', t('importCatalog'), 'food', 'btn secondary')}</div><p class="help gap-top">${t('dataNote')}</p><details class="danger-zone"><summary>${t('reset')}</summary>${action('reset', t('reset'), 'trash', 'btn danger gap-top')}</details></section><section class="panel settings-panel"><div class="between"><h2>${t('about')}</h2><span class="pill">3.0</span></div><div class="about-links"><a href="https://www.tablycjakalorijnosti.com.ua/tablytsya-yizhyi" target="_blank" rel="noopener">Таблиця Калорійності ↗</a><a href="https://fdc.nal.usda.gov" target="_blank" rel="noopener">USDA ↗</a><a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts ↗</a></div><p class="source-foot">USDA: public domain · Open Food Facts: ODbL</p>${action('install', t('install'), 'download', 'btn secondary full gap-top')}</section></div>`;
+      )}</section><section class="panel settings-panel"><h2>${t('data')}</h2><div class="data-buttons">${action('export', t('export'), 'download', 'btn secondary')}<label class="btn secondary file-label">${icon('upload')}${t('import')}<input id="import-file" type="file" accept="application/json,.json"></label>${action('import-catalog', t('importCatalog'), 'food', 'btn secondary')}</div><p class="help gap-top">${t('dataNote')}</p><details class="danger-zone"><summary>${t('reset')}</summary>${action('reset', t('reset'), 'trash', 'btn danger gap-top')}</details></section><section class="panel settings-panel"><div class="between"><h2>${t('about')}</h2><span class="pill">4.0</span></div><div class="about-links"><a href="https://www.tablycjakalorijnosti.com.ua/tablytsya-yizhyi" target="_blank" rel="noopener">Таблиця Калорійності ↗</a><a href="https://fdc.nal.usda.gov" target="_blank" rel="noopener">USDA ↗</a><a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts ↗</a></div><p class="source-foot">USDA: public domain · Open Food Facts: ODbL</p>${action('install', t('install'), 'download', 'btn secondary full gap-top')}</section></div>`;
   }
   function progressHTML() {
     return FUI.statsHTML();
@@ -457,6 +458,7 @@
     modalContext = {};
     modal.className = wide ? 'wide' : '';
     modal.innerHTML = `<div class="dialog-head"><h2 id="modal-title">${esc(title)}</h2>${ib('close-modal', 'close', t('close'))}</div>${body}`;
+    modal.scrollTop = 0;
     if (!modal.open) modal.showModal();
   }
   function closeModal() {
@@ -529,7 +531,7 @@
 
   function dailyExtrasHTML() {
     const rows = N.extras.map((k) => ({ k, ...N.total(day().entries, k) })),
-      micro = ['calcium', 'iron', 'potassium', 'vitaminC']
+      micro = ['calcium', 'iron', 'potassium', 'vitaminC', 'sodium']
         .map((k) => ({ k, ...N.total(day().entries, k) }))
         .filter((r) => r.known > 0),
       incomplete = rows.some((r) => !r.complete) || micro.some((r) => !r.complete);
@@ -546,7 +548,9 @@
       projected = C.total(others).kcal + energy,
       projectedPercent = N.percent(projected, state.targets.kcal),
       mix = N.distribution(food),
-      micro = ['calcium', 'iron', 'potassium', 'vitaminC'].filter((k) => N.known(food[k]));
+      micro = ['calcium', 'iron', 'potassium', 'vitaminC', 'sodium'].filter((k) =>
+        N.known(food[k])
+      );
     return `<section class="portion-energy tone-${N.tone(energy, state.targets.kcal)}"><div><span class="nutrition-overline">${t('inThisPortion')}</span><strong>${fmt(energy)} <small>${t('kcal')}</small></strong></div><div class="portion-daily"><strong>${ep == null ? '—' : fmt(ep) + '%'}</strong><span>${t('ofDailyTarget')}</span></div><div class="energy-track"><span style="width:${ep == null ? 0 : Math.min(100, ep)}%"></span></div></section><section class="nutrient-group primary-nutrients"><div class="nutrient-group-heading"><h3>${t('dailyContribution')}</h3><span>${fmt(grams, 1)} ${FUI.unitLabel(C.basis(food))}</span></div><div class="portion-macros">${[
       ['p', 'protein'],
       ['f', 'fat'],
@@ -580,9 +584,10 @@
     } catch {}
     FUI.refreshConversion(result);
     const el = $('#portion-nutrition');
-    if (el) el.innerHTML = result
-      ? portionNutrition(result.food, result.grams)
-      : `<p class="empty-inline">${t('calibratePortion')}</p>`;
+    if (el)
+      el.innerHTML = result
+        ? portionNutrition(result.food, result.grams)
+        : `<p class="empty-inline">${t('calibratePortion')}</p>`;
   }
 
   function productHeading(food) {
@@ -661,7 +666,7 @@
     const found = !!food.sourceUrl;
     openModal(
       found ? t('completeLabel') : t('addByBarcode'),
-      `<div class="dialog-food-name">${photoHTML(food, 'hero')}<div class="product-heading-copy"><h3>${esc(found ? name(food) : t('newFood'))}</h3><small class="muted">${esc(code)}</small></div></div><p class="completion-note">${t(found ? 'foundIncomplete' : 'barcodeAbsent')}</p><form id="complete-food-form"><label>${t('foodName')}<input name="name" maxlength="200" value="${esc(found ? name(food) : '')}" required></label><div class="field-grid gap-top">${[
+      `<div class="dialog-food-name">${photoHTML(food, 'hero')}<div class="product-heading-copy"><h3>${esc(found ? name(food) : t('newFood'))}</h3><small class="muted">${esc(code)}</small></div></div><p class="completion-note">${t(found ? 'foundIncomplete' : 'barcodeAbsent')}</p><form id="complete-food-form">${FUI.scanButton()}<label class="gap-top">${t('foodName')}<input name="name" maxlength="200" value="${esc(found ? name(food) : '')}" required></label><div class="field-grid gap-top">${[
         ['kcal', 'kcal', 1000],
         ['p', 'protein', 100],
         ['f', 'fat', 100],
@@ -676,6 +681,8 @@
         )}</div>${food.plainWaterCandidate ? action('plain-water', t('plainWater'), 'drop', 'btn secondary full gap-top') : ''}<div class="dialog-actions">${action('close-modal', t('cancel'), null, 'btn secondary')}<button type="submit" class="btn">${t('saveLabel')}</button></div></form>`
     );
     modalContext = { type: 'completion', food: structuredClone(food), meal, code };
+    FUI.addLabelFields($('#complete-food-form'));
+    $('#complete-food-form [name=basis]').value = C.basis(food);
   }
   function unknownBarcodeModal(code, meal = modalContext.meal ?? 0) {
     completionModal(
@@ -699,7 +706,7 @@
     const meal = modalContext.meal ?? 0;
     openModal(
       t('createFood'),
-      `<form id="custom-food-form"><label>${t('foodName')}<input name="name" maxlength="200" required></label><p class="help gap-top">${t('per100')}</p><div class="field-grid gap-top">${[
+      `<form id="custom-food-form">${FUI.scanButton()}<label class="gap-top">${t('foodName')}<input name="name" maxlength="200" required></label><p class="help gap-top">${t('per100Any')}</p><div class="field-grid gap-top">${[
         ['kcal', 'kcal', 1000],
         ['p', 'protein', 100],
         ['f', 'fat', 100],
@@ -714,6 +721,7 @@
         )}</div><details class="extra-target-settings"><summary>${t('extraNutrients')}</summary><div class="field-grid gap-top">${N.extras.map((k) => `<label>${t(k)} (${t('g')})<input name="food-${k}" type="number" min="0" max="100" step=".01" inputmode="decimal" placeholder="—"></label>`).join('')}</div></details><div class="dialog-actions"><button class="btn" type="submit">${t('save')}</button></div></form>`
     );
     modalContext = { type: 'custom', meal };
+    FUI.addLabelFields($('#custom-food-form'));
   }
   function confirmation(message, callback) {
     openModal(
@@ -1338,6 +1346,7 @@
       case 'custom-food-form': {
         const n = String(f.get('name')).trim(),
           food = {
+            ...modalContext.labelDraft,
             id: 'custom-' + uid(),
             names: [n, n, n],
             kcal: Number(f.get('kcal')),
@@ -1396,6 +1405,7 @@
         }
         const completed = {
           ...ctx.food,
+          ...ctx.labelDraft,
           names: [n, n, n],
           source: 'custom',
           originSource: ctx.food.source,
@@ -1483,7 +1493,8 @@
     render,
     notify: toast,
     uid,
-    openSearch: addFoodModal
+    openSearch: addFoodModal,
+    createFood: customFoodModal
   });
   document.addEventListener(
     'toggle',

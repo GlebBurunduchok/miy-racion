@@ -56,7 +56,8 @@
       'calcium',
       'iron',
       'potassium',
-      'vitaminC'
+      'vitaminC',
+      'sodium'
     ]) {
       let total = 0,
         complete = true;

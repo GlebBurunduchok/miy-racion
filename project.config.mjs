@@ -1,9 +1,10 @@
 /** One source of truth for the browser, offline cache and standalone build. */
-export const version = '3.0.0';
+export const version = '4.0.0';
 export const browserScripts = [
   'data.js',
   'strings.js',
   'feature-strings.js',
+  'community-strings.js',
   'catalog.js',
   'product-assets.js',
   'product-photos.js',
@@ -11,11 +12,14 @@ export const browserScripts = [
   'search.js',
   'nutrition.js',
   'features.js',
+  'community.js',
+  'label.js',
   'providers.js',
   'storage.js',
   'api.js',
   'media.js',
   'feature-ui.js',
+  'community-ui.js',
   'app.js'
 ];
 export const embeddedAssets = {
@@ -31,8 +35,25 @@ export const embeddedAssets = {
 export const publicFiles = [
   'index.html',
   'styles.css',
+  'community.css',
   ...browserScripts,
   'manifest.webmanifest',
   ...Object.keys(embeddedAssets),
   'vendor/zxing-browser.min.js'
+];
+
+// OCR is downloaded only when scanning a label, then cached for offline use.
+export const ocrFiles = [
+  'vendor/ocr/tesseract.min.js',
+  'vendor/ocr/worker.min.js',
+  ...[
+    'tesseract-core',
+    'tesseract-core-simd',
+    'tesseract-core-lstm',
+    'tesseract-core-simd-lstm'
+  ].flatMap((name) => [
+    'vendor/ocr/core/' + name + '.wasm.js',
+    'vendor/ocr/core/' + name + '.wasm'
+  ]),
+  ...['ukr', 'eng', 'rus'].map((lang) => 'vendor/ocr/lang/' + lang + '.traineddata.gz')
 ];
