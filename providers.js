@@ -34,6 +34,17 @@
       barcode: String(p.code),
       sourceUrl: 'https://world.openfoodfacts.org/product/' + encodeURIComponent(p.code)
     };
+    if (p.nutrition_data_per === '100ml') f.basis = 'ml';
+    const pack = String(p.quantity || '')
+      .trim()
+      .match(/^(\d+(?:[.,]\d+)?)\s*(kg|кг|g|г|ml|мл|l|л)\b/i);
+    if (pack) {
+      const amount =
+          Number(pack[1].replace(',', '.')) * (/^(kg|кг|l|л)$/i.test(pack[2]) ? 1000 : 1),
+        unit = /^(ml|мл|l|л)$/i.test(pack[2]) ? 'ml' : 'g';
+      if (unit === (f.basis || 'g') && amount > 0 && amount <= 10000)
+        f.measure = { package: amount };
+    }
     f.nutritionIncomplete = ['kcal', 'p', 'f', 'c'].some((k) => f[k] === null);
     f.plainWaterCandidate =
       categories.includes('en:waters') &&

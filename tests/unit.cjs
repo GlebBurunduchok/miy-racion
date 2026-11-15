@@ -4,6 +4,7 @@ const fs = require('node:fs'),
   C = require('../core.js');
 const N = require('../nutrition.js'),
   P = require('../providers.js');
+require('../features.js');
 let checks = 0;
 function test(name, fn) {
   fn();
@@ -25,6 +26,7 @@ const sandbox = { window: { RationCore: C, RationNutrition: N } };
 for (const file of [
   'data.js',
   'strings.js',
+  'feature-strings.js',
   'catalog.js',
   'product-assets.js',
   'product-photos.js',
@@ -124,7 +126,7 @@ test('All literal translation keys exist', () => {
 test('Standalone HTML scripts parse and embed photographs', () => {
   const html = fs.readFileSync(rootDir + '/Mii_Ratsion.html', 'utf8');
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-  assert.equal(scripts.length, 13);
+  assert.equal(scripts.length, 17);
   for (const [, script] of scripts) new vm.Script(script);
   assert(html.includes('data:image/jpeg;base64,'));
   assert(!html.includes('<link rel="stylesheet"'));
@@ -339,7 +341,7 @@ test('Safe-area layout covers top, bottom and landscape edges', () => {
   const css = fs.readFileSync(rootDir + '/styles.css', 'utf8');
   for (const edge of ['top', 'bottom', 'left', 'right'])
     assert(css.includes('safe-area-inset-' + edge));
-  assert(/height:\s*calc\(68px \+ var\(--safe-top\)\)/.test(css));
+  assert(/height:\s*calc\(62px \+ var\(--safe-top\)\)/.test(css));
   const html = fs.readFileSync(rootDir + '/index.html', 'utf8');
   assert(html.includes('icon-v2-3-180.png'));
 });

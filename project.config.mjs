@@ -1,17 +1,21 @@
 /** One source of truth for the browser, offline cache and standalone build. */
-export const version = '2.3.0';
+export const version = '3.0.0';
 export const browserScripts = [
   'data.js',
   'strings.js',
+  'feature-strings.js',
   'catalog.js',
   'product-assets.js',
   'product-photos.js',
   'core.js',
   'search.js',
   'nutrition.js',
+  'features.js',
   'providers.js',
   'storage.js',
   'api.js',
+  'media.js',
+  'feature-ui.js',
   'app.js'
 ];
 export const embeddedAssets = {

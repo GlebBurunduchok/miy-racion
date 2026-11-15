@@ -5,6 +5,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 for (const file of [
   'build-single.mjs',
   'tests/unit.cjs',
+  'tests/features.cjs',
   'tests/api.mjs',
   'tests/storage.cjs',
   'tests/dom.mjs'

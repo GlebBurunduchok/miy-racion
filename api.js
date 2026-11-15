@@ -46,7 +46,7 @@ window.RationAPI = (() => {
               page_size: '30',
               lc: lang,
               fields:
-                'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
+                'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,quantity,nutrition_data_per,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
               app_name: 'MiiRatsionWeb'
             }),
           signal
@@ -72,7 +72,7 @@ window.RationAPI = (() => {
         const data = await json(
           'https://world.openfoodfacts.org/api/v2/product/' +
             candidate +
-            '.json?fields=code,product_name,product_name_uk,product_name_ru,product_name_en,brands,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
+            '.json?fields=code,product_name,product_name_uk,product_name_ru,product_name_en,brands,quantity,nutrition_data_per,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
           signal,
           true
         );

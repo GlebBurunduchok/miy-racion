@@ -42,7 +42,7 @@ async function details(source, value) {
     const data = await upstream(
       'https://world.openfoodfacts.org/api/v2/product/' +
         value +
-        '.json?fields=code,product_name,product_name_uk,product_name_ru,product_name_en,brands,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
+        '.json?fields=code,product_name,product_name_uk,product_name_ru,product_name_en,brands,quantity,nutrition_data_per,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade',
       true
     );
     result = data.status === 1 ? P.fromOFF({ ...data.product, code: value }) : null;
@@ -81,7 +81,7 @@ async function search(q, lang) {
       page_size: '30',
       langs: [lang, 'en'].join(','),
       fields:
-        'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade'
+        'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,quantity,nutrition_data_per,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade'
     });
   const tableURL =
     'https://www.tablycjakalorijnosti.com.ua/foodstuff/filter-list?' +
@@ -115,7 +115,7 @@ async function search(q, lang) {
             page_size: '30',
             lc: lang,
             fields:
-              'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade'
+              'code,product_name,product_name_uk,product_name_ru,product_name_en,brands,quantity,nutrition_data_per,nutriments,categories_tags,image_front_url,image_front_small_url,selected_images,nutriscore_grade'
           })
       );
       foods = (data.products || []).map(P.fromOFF).filter(Boolean);

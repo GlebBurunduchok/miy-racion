@@ -3,6 +3,7 @@ import vm from 'node:vm';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { browserScripts } from '../project.config.mjs';
 const dir = new URL('../', import.meta.url),
   read = (n) => fs.readFileSync(new URL(n, dir), 'utf8'),
   delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -88,19 +89,7 @@ function environment(seed, options = {}) {
     AbortController,
     AbortSignal
   });
-  for (const f of [
-    'data.js',
-    'strings.js',
-    'catalog.js',
-    'product-assets.js',
-    'product-photos.js',
-    'core.js',
-    'search.js',
-    'nutrition.js',
-    'providers.js',
-    'storage.js',
-    'app.js'
-  ])
+  for (const f of browserScripts.filter((file) => file !== 'api.js'))
     vm.runInContext(read(f), context, { filename: f });
   const q = (s) => document.querySelector(s),
     all = (s) => [...document.querySelectorAll(s)],
@@ -440,4 +429,181 @@ test('Failed writes retain old data and show an error', () => {
   assert(quotaUI.q('.offline-banner'));
   assert(quotaUI.q('#toast').classList.contains('error'));
 });
+// End-to-end feature interactions run against the same UI and persistence code.
+function choose(env, selector, value) {
+  const select = env.q(selector);
+  assert(select, selector);
+  for (const option of select.querySelectorAll('option')) {
+    if (option.getAttribute('value') === value) option.setAttribute('selected', '');
+    else option.removeAttribute('selected');
+  }
+  select.dispatchEvent(new Event('change', { bubbles: true }));
+}
+const featureSeed = structuredClone(a.stored());
+featureSeed.days = {};
+featureSeed.customFoods = [];
+featureSeed.photos = {};
+delete featureSeed.streakSeen;
+const fresh = environment(featureSeed);
+fresh.click('[data-action=add-food][data-meal="0"]');
+fresh.click('#add-results [data-action=portion]');
+choose(fresh, '#portion-unit', 'piece');
+fresh.input('#portion-size', '125');
+fresh.input('#portion-grams', '2');
+await fresh.submit('#portion-form');
+test('Piece quantities save their conversion and ignite a one-day streak', () => {
+  const entry = Object.values(fresh.stored().days)[0].entries[0];
+  assert.equal(entry.grams, 250);
+  assert.equal(entry.amount, 2);
+  assert.equal(entry.unit, 'piece');
+  assert.equal(entry.food.measure.piece, 125);
+  assert(fresh.q('.streak-pill.is-lit'));
+  assert.equal(fresh.q('.streak-pill span').textContent, '1');
+  assert(fresh.q('#streak-celebration.ignite'));
+});
+fresh.click('[data-action=edit-entry]');
+test('Editing preserves quantity and chosen unit', () => {
+  assert.equal(fresh.q('#portion-unit').value, 'piece');
+  assert.equal(fresh.q('#portion-grams').value, '2');
+  assert.equal(fresh.q('#portion-size').value, '125');
+});
+fresh.click('[data-action=close-modal]');
+fresh.click('[data-action=add-food][data-meal="1"]');
+fresh.click('#add-results [data-action=portion]');
+choose(fresh, '#portion-unit', 'ml');
+fresh.input('#portion-size', '1.03');
+fresh.input('#portion-grams', '250');
+await fresh.submit('#portion-form');
+test('Millilitres use the supplied density and keep the streak at one', () => {
+  const rows = Object.values(fresh.stored().days)[0].entries;
+  assert.equal(rows[1].grams, 257.5);
+  assert.equal(rows[1].unit, 'ml');
+  assert.equal(fresh.q('.streak-pill span').textContent, '1');
+});
+fresh.click('[data-action=show-recipes]');
+fresh.click('[data-action=new-recipe]');
+fresh.set('#recipe-name', 'My test recipe');
+fresh.click('[data-action=add-ingredient]');
+fresh.click('#add-results [data-action=portion]');
+fresh.set('#portion-grams', '100');
+await fresh.submit('#portion-form');
+test('Ingredient selection returns to the recipe without adding diary food', () => {
+  assert(fresh.q('#recipe-form'));
+  assert.equal(fresh.all('.ingredient-row').length, 1);
+  assert.equal(Object.values(fresh.stored().days)[0].entries.length, 2);
+  assert.equal(fresh.q('#recipe-name').value, 'My test recipe');
+});
+fresh.input('#recipe-yield', '200');
+fresh.input('#recipe-servings', '2');
+await fresh.submit('#recipe-form');
+test('Recipe save calculates per-100g nutrition and a real serving size', () => {
+  const food = fresh.stored().customFoods.find((food) => food.kind === 'recipe');
+  assert(food);
+  assert.equal(food.kcal, food.recipe.ingredients[0].food.kcal / 2);
+  assert.equal(food.recipe.yieldAmount, 200);
+  assert.equal(food.measure.piece, 100);
+  assert(fresh.q('.recipe-card'));
+});
+fresh.click('.recipe-card [data-action=portion]');
+choose(fresh, '#portion-unit', 'piece');
+fresh.set('#portion-grams', '1');
+await fresh.submit('#portion-form');
+test('A recipe portion can be logged with its saved serving size', () => {
+  const row = Object.values(fresh.stored().days)[0].entries.at(-1);
+  assert.equal(row.food.kind, 'recipe');
+  assert.equal(row.grams, 100);
+  assert.equal(row.unit, 'piece');
+});
+fresh.click('[data-action=show-foods]');
+fresh.click('#catalog-results [data-action=portion]');
+fresh.click('[data-action=edit-food]');
+const beforeEdit = structuredClone(Object.values(fresh.stored().days)[0].entries[0].food);
+fresh.set('#food-editor-form [name=name]', 'Edited label');
+fresh.set('#food-editor-form [name=kcal]', '123');
+fresh.set('#food-editor-form [name=barcode]', '9988776655443');
+fresh.window.RationMedia.prepare = async () => 'data:image/jpeg;base64,/9j/2Q==';
+const photoInput = fresh.q('#food-photo-file');
+Object.defineProperty(photoInput, 'files', { value: [{}] });
+photoInput.dispatchEvent(new Event('change', { bubbles: true }));
+await delay(20);
+await fresh.submit('#food-editor-form');
+test('Editing a product saves a barcode and one private photo without changing past meals', () => {
+  const food = fresh.stored().customFoods.find((food) => food.names[0] === 'Edited label');
+  assert(food);
+  assert.equal(food.kcal, 123);
+  assert.equal(food.barcode, '9988776655443');
+  assert(food.photoId);
+  assert.equal(Object.keys(fresh.stored().photos).length, 1);
+  assert.equal(Object.values(fresh.stored().days)[0].entries[0].food.kcal, beforeEdit.kcal);
+  assert(fresh.window.RationCore.validState(fresh.stored()));
+});
+const withPhoto = environment(fresh.stored());
+withPhoto.click('[data-action=nav][data-page=foods]');
+withPhoto.input('#catalog-search', 'Edited label');
+await delay(40);
+test('Own photographs survive reload and render from the local photo map', () => {
+  const image = withPhoto.q('.food-row img');
+  assert(image);
+  assert(image.getAttribute('src').startsWith('data:image/jpeg'));
+});
+withPhoto.click('[data-action=nav][data-page=insights]');
+withPhoto.click('[data-action=report-range][data-value="30"]');
+test('Month view renders 30 real dates and range statistics', () =>
+  assert.equal(withPhoto.all('.bar-column').length, 30));
+const repeatSeed = structuredClone(featureSeed),
+  repeatDate = a.window.RationCore.shiftDate(a.window.RationCore.dateKey(), -1),
+  repeatFood = structuredClone(Object.values(a.stored().days)[0].entries[0].food);
+repeatSeed.days[repeatDate] = {
+  entries: [
+    {
+      id: 'previous-meal',
+      food: repeatFood,
+      grams: 150,
+      amount: 150,
+      unit: 'g',
+      meal: 0,
+      loggedOn: repeatDate
+    }
+  ],
+  water: []
+};
+const repeatUI = environment(repeatSeed);
+repeatUI.click('[data-action=repeat-meal][data-meal="0"]');
+repeatUI.click('[data-action=use-meal]');
+test('Repeating a meal creates fresh entries and credits the current day', () => {
+  const today = a.window.RationCore.dateKey(),
+    row = repeatUI.stored().days[today].entries[0];
+  assert.equal(row.grams, 150);
+  assert.notEqual(row.id, 'previous-meal');
+  assert.equal(row.loggedOn, today);
+  assert.equal(repeatUI.q('.streak-pill span').textContent, '2');
+});
+repeatUI.click('[data-action=undo]');
+test('Undo of a repeated meal restores its pending streak', () => {
+  assert.equal(repeatUI.stored().days[a.window.RationCore.dateKey()].entries.length, 0);
+  assert(repeatUI.q('.streak-pill.is-pending'));
+  assert.equal(repeatUI.q('.streak-pill span').textContent, '1');
+});
+const lostSeed = structuredClone(featureSeed);
+const oldDate = a.window.RationCore.shiftDate(a.window.RationCore.dateKey(), -2);
+lostSeed.days[oldDate] = {
+  entries: [{ id: 'old-streak', food: repeatFood, grams: 100, meal: 0, loggedOn: oldDate }],
+  water: []
+};
+lostSeed.streakSeen = { date: oldDate, count: 5, lit: true };
+const lostUI = environment(lostSeed);
+test('Opening after a missed day clears the old count and animates extinction', () => {
+  assert(lostUI.q('.streak-pill.is-off'));
+  assert.equal(lostUI.q('.streak-pill span').textContent, '—');
+  assert(lostUI.q('#streak-celebration.lost'));
+});
+fresh.click('[data-action=nav][data-page=diary]');
+test('Daily nutrient details are collapsible', () => {
+  assert(fresh.q('details#daily-nutrients'));
+  assert(fresh.q('.calorie-total'));
+  assert.equal(fresh.all('.day-chip').length, 7);
+});
+test('The complete feature state remains a valid export', () =>
+  assert(fresh.window.RationCore.validState(JSON.parse(JSON.stringify(fresh.stored())))));
+
 console.log(checks + ' DOM scenarios passed.');
