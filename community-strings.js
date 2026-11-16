@@ -1,4 +1,45 @@
 Object.assign(window.RATION_TEXT, {
+  recropLabel: ['Змінити рамку', 'Изменить рамку', 'Adjust crop'],
+  ocrReadingNumbers: ['Уточнюю цифри', 'Уточняю цифры', 'Checking numbers'],
+  tryAgain: ['Спробувати ще', 'Попробовать ещё', 'Try again'],
+  privacyTitle: ['Конфіденційність', 'Конфиденциальность', 'Privacy'],
+  privacySummary: [
+    'Де зберігаються дані та як ними керувати.',
+    'Где сохраняются данные и как ими управлять.',
+    'Where your data is stored and how to manage it.'
+  ],
+  ocrTableFound: [
+    'Таблицю виділено. За потреби змініть рамку.',
+    'Таблица выделена. При необходимости измените рамку.',
+    'Table selected. Adjust the frame if needed.'
+  ],
+  ocrReadingRows: ['Читаю таблицю', 'Читаю таблицу', 'Reading the table'],
+  ocrOrienting: ['Перевіряю поворот', 'Проверяю поворот', 'Checking orientation'],
+  ocrModelError: [
+    'Не вдалося підготувати OCR. Перезавантажте сайт і спробуйте знову. Код: OCR_MODEL.',
+    'Не удалось подготовить OCR. Перезагрузите сайт и попробуйте снова. Код: OCR_MODEL.',
+    'Could not prepare OCR. Reload the site and try again. Code: OCR_MODEL.'
+  ],
+  ocrMemoryError: [
+    'Пристрою бракує пам’яті для цього знімка. Закрийте зайві вкладки й виділіть лише таблицю. Код: OCR_MEMORY.',
+    'Устройству не хватает памяти для этого снимка. Закройте лишние вкладки и выделите только таблицу. Код: OCR_MEMORY.',
+    'Not enough memory for this image. Close extra tabs and select only the table. Code: OCR_MEMORY.'
+  ],
+  ocrTimeoutError: [
+    'Розпізнавання тривало занадто довго. Спробуйте виділити лише таблицю. Код: OCR_TIMEOUT.',
+    'Распознавание заняло слишком много времени. Попробуйте выделить только таблицу. Код: OCR_TIMEOUT.',
+    'Recognition took too long. Try selecting only the table. Code: OCR_TIMEOUT.'
+  ],
+  ocrReadError: [
+    'Помилка розпізнавання. Спробуйте інший знімок або внесіть цифри вручну. Код: OCR_READ.',
+    'Ошибка распознавания. Попробуйте другой снимок или внесите цифры вручную. Код: OCR_READ.',
+    'Recognition failed. Try another photo or enter the numbers manually. Code: OCR_READ.'
+  ],
+  ocrAutoRotation: [
+    'Поворот перевіряється автоматично; нечіткі цифри звірте з етикеткою.',
+    'Поворот проверяется автоматически; нечёткие цифры сверьте с этикеткой.',
+    'Orientation is checked automatically; compare unclear numbers with the label.'
+  ],
   resultOne: ['результат', 'результат', 'result'],
   resultFew: ['результати', 'результата', 'results'],
   resultMany: ['результатів', 'результатов', 'results'],

@@ -73,7 +73,8 @@
   ].map((s) => C.normalize(s).split(' '));
   C.search = (foods, q) => {
     const query = C.normalize(q);
-    if (!query) return foods;
+    if (!query)
+      return [...foods].sort((a, b) => Number(!!C.isBasicFood?.(b)) - Number(!!C.isBasicFood?.(a)));
     const tokens = query
       .split(' ')
       .map((token) => groups.find((g) => g.includes(token)) || [token]);
@@ -87,6 +88,7 @@
         index.set(food, item);
       }
       let score =
+          (C.isBasicFood?.(food) ? 18 : 0) +
           (food.source === 'reference' ? 6 : food.source === 'tablycja' ? 4 : 0) +
           (food.imageUrl ? 3 : 0),
         ok = true;

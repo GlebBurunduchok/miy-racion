@@ -2,6 +2,7 @@
 (function () {
   const baseFactory = window.RationFeatureUI;
   window.RationFeatureUI = function (env) {
+    const privacy = window.RationPrivacyUI(env);
     const base = baseFactory(env),
       C = window.RationCore,
       N = window.RationNutrition;
@@ -90,14 +91,15 @@
       source,
       rect,
       drag,
-      worker,
+      scanController,
+      scanLanguage,
       scanToken = 0,
       result,
       cropPreview;
     function endScan() {
       scanToken++;
-      worker?.terminate().catch(() => {});
-      worker = null;
+      scanController?.abort();
+      scanController = null;
       scanDialog?.close();
       scanDialog?.remove();
       scanDialog = null;
@@ -141,11 +143,16 @@
           rect = { x: 0, y: 0, w: 1, h: 1 };
           paint();
         }
-        if (a === 'read') void recognize();
+        if (a === 'read' || a === 'retry-recognition') void recognize();
+        if (a === 'recrop' && source) {
+          scanToken++;
+          scanController?.abort();
+          renderCrop();
+        }
         if (a === 'retry') {
           scanToken++;
-          worker?.terminate().catch(() => {});
-          worker = null;
+          scanController?.abort();
+          scanController = null;
           source = null;
           choose();
         }
@@ -163,6 +170,7 @@
       scanDialog.showModal();
     }
     function choose() {
+      $('#label-title').textContent = t('scanLabel');
       $('#label-stage').innerHTML =
         `<div class="label-intro-art">${icon('camera')}<i></i><span>100 g / 100 ml</span></div><p class="label-instruction">${t('labelIntro')}</p><div class="label-photo-actions"><label class="btn file-label">${icon('camera')}${t('takeLabel')}<input data-label-file type="file" accept="image/*" capture="environment"></label><label class="btn secondary file-label">${icon('upload')}${t('chooseLabel')}<input data-label-file type="file" accept="image/*"></label></div><p class="field-note">${icon('lock')}${t('labelPrivacy')}</p>`;
     }
@@ -170,7 +178,12 @@
       if (!file) return;
       const token = ++scanToken;
       try {
-        if (file.size > 20 * 1024 * 1024 || !file.type.startsWith('image/')) throw Error();
+        if (
+          file.size > 20 * 1024 * 1024 ||
+          (!file.type.startsWith('image/') &&
+            !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || ''))
+        )
+          throw Error();
         const url = URL.createObjectURL(file),
           image = new Image();
         try {
@@ -192,47 +205,52 @@
         ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, source.width, source.height);
         ctx.drawImage(image, 0, 0, source.width, source.height);
-        rect = { x: 0, y: 0, w: 1, h: 1 };
-        $('#label-stage').innerHTML =
-          `<p class="field-note">${t('cropLabel')}</p><div class="crop-surface"><canvas id="label-canvas" aria-label="${t('cropLabel')}"></canvas></div><div class="crop-tools"><button class="btn secondary" data-label-action="rotate">${icon('repeat')}${t('rotatePhoto')}</button><button class="text-button" data-label-action="reset">${t('resetCrop')}</button></div><label>${t('labelLanguage')}<select id="ocr-language"><option value="ukr+eng" ${state().lang === 'uk' ? 'selected' : ''}>Українська + English</option><option value="rus+eng" ${state().lang === 'ru' ? 'selected' : ''}>Русский + English</option><option value="eng" ${state().lang === 'en' ? 'selected' : ''}>English</option></select></label><div class="dialog-actions"><button class="btn" data-label-action="read">${icon('spark')}${t('recognize')}</button></div>`;
-        const canvas = $('#label-canvas');
-        const point = (e) => {
-          const r = canvas.getBoundingClientRect();
-          return {
-            x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
-            y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
-          };
-        };
-        canvas.addEventListener('pointerdown', (e) => {
-          drag = point(e);
-          canvas.setPointerCapture(e.pointerId);
-          e.preventDefault();
-        });
-        canvas.addEventListener('pointermove', (e) => {
-          if (!drag) return;
-          const p = point(e);
-          rect = {
-            x: Math.min(drag.x, p.x),
-            y: Math.min(drag.y, p.y),
-            w: Math.abs(p.x - drag.x),
-            h: Math.abs(p.y - drag.y)
-          };
-          paint();
-        });
-        canvas.addEventListener('pointerup', () => {
-          drag = null;
-          if (rect.w < 0.025 || rect.h < 0.025) rect = { x: 0, y: 0, w: 1, h: 1 };
-          paint();
-        });
-        canvas.addEventListener('pointercancel', () => {
-          drag = null;
-          rect = { x: 0, y: 0, w: 1, h: 1 };
-          paint();
-        });
-        paint();
+        rect = window.RationOCR.detectTable(source) || { x: 0, y: 0, w: 1, h: 1 };
+        renderCrop();
       } catch {
         if (token === scanToken) notify(t('ocrError'), true);
       }
+    }
+    function renderCrop() {
+      $('#label-title').textContent = t('scanLabel');
+      $('#label-stage').innerHTML =
+        `<p class="field-note">${t('cropLabel')}</p>${rect.confidence ? `<p class="crop-auto-hint" id="crop-auto-hint">${t('ocrTableFound')}</p>` : ''}<div class="crop-surface"><canvas id="label-canvas" aria-label="${t('cropLabel')}"></canvas></div><div class="crop-tools"><button class="btn secondary" data-label-action="rotate">${icon('repeat')}${t('rotatePhoto')}</button><button class="text-button" data-label-action="reset">${t('resetCrop')}</button></div><label>${t('labelLanguage')}<select id="ocr-language"><option value="ukr+eng" ${state().lang === 'uk' ? 'selected' : ''}>Українська + English</option><option value="rus+eng" ${state().lang === 'ru' ? 'selected' : ''}>Русский + English</option><option value="eng" ${state().lang === 'en' ? 'selected' : ''}>English</option></select></label><div class="dialog-actions"><button class="btn" data-label-action="read">${icon('spark')}${t('recognize')}</button></div>`;
+      const canvas = $('#label-canvas');
+      const point = (e) => {
+        const r = canvas.getBoundingClientRect();
+        return {
+          x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
+          y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+        };
+      };
+      canvas.addEventListener('pointerdown', (e) => {
+        $('#crop-auto-hint')?.remove();
+        drag = point(e);
+        canvas.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      canvas.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const p = point(e);
+        rect = {
+          x: Math.min(drag.x, p.x),
+          y: Math.min(drag.y, p.y),
+          w: Math.abs(p.x - drag.x),
+          h: Math.abs(p.y - drag.y)
+        };
+        paint();
+      });
+      canvas.addEventListener('pointerup', () => {
+        drag = null;
+        if (rect.w < 0.025 || rect.h < 0.025) rect = { x: 0, y: 0, w: 1, h: 1 };
+        paint();
+      });
+      canvas.addEventListener('pointercancel', () => {
+        drag = null;
+        rect = { x: 0, y: 0, w: 1, h: 1 };
+        paint();
+      });
+      paint();
     }
     function paint() {
       const canvas = $('#label-canvas');
@@ -283,85 +301,83 @@
     }
     async function recognize() {
       if (!source) return;
-      const token = ++scanToken,
-        lang = $('#ocr-language').value;
+      const token = ++scanToken;
+      scanController?.abort();
+      scanController = new AbortController();
+      scanLanguage =
+        $('#ocr-language')?.value ||
+        scanLanguage ||
+        (state().lang === 'ru' ? 'rus+eng' : state().lang === 'en' ? 'eng' : 'ukr+eng');
       const crop = document.createElement('canvas'),
-        width = source.width * rect.w,
-        height = source.height * rect.h,
-        scale = Math.min(3, 2200 / Math.max(width, height));
+        sourceX = Math.max(0, Math.round(source.width * rect.x)),
+        sourceY = Math.max(0, Math.round(source.height * rect.y)),
+        width = Math.min(source.width - sourceX, Math.max(1, Math.round(source.width * rect.w))),
+        height = Math.min(source.height - sourceY, Math.max(1, Math.round(source.height * rect.h))),
+        scale = Math.min(1, 1800 / Math.max(width, height));
       crop.width = Math.max(1, Math.round(width * scale));
       crop.height = Math.max(1, Math.round(height * scale));
       crop
         .getContext('2d')
-        .drawImage(
-          source,
-          rect.x * source.width,
-          rect.y * source.height,
-          width,
-          height,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
+        .drawImage(source, sourceX, sourceY, width, height, 0, 0, crop.width, crop.height);
+      cropPreview = crop.toDataURL('image/jpeg', 0.88);
       $('#label-stage').innerHTML =
-        `<div class="ocr-working"><div class="scanner-orbit">${icon('scan')}</div><h3>${t('recognizing')}</h3><p id="ocr-status" role="status">${t('preparingOCR')}</p><progress id="ocr-progress" max="1" value="0"></progress><button class="text-button" data-label-action="retry">${t('cancel')}</button></div>`;
-      cropPreview = crop.toDataURL('image/jpeg', 0.82);
-      let timeout,
-        finished = false;
+        `<div class="ocr-working"><div class="scanner-orbit">${icon('scan')}</div><h3>${t('recognizing')}</h3><p id="ocr-status" role="status">${t('preparingOCR')}</p><progress id="ocr-progress" max="1" value="0"></progress><p class="ocr-progress-meta">${t('ocrAutoRotation')}</p><button class="text-button" data-label-action="recrop">${t('cancel')}</button></div>`;
       try {
-        const task = (async () => {
-          const T = await loadOCR();
-          if (token !== scanToken || finished) return;
-          const local = !cdnOCR();
-          const options = {
-            logger: (m) => {
-              if (token !== scanToken) return;
-              if ($('#ocr-progress')) $('#ocr-progress').value = m.progress || 0;
-              if ($('#ocr-status'))
-                $('#ocr-status').textContent =
-                  t(m.status === 'recognizing text' ? 'recognizing' : 'preparingOCR') +
-                  ' ' +
-                  Math.round((m.progress || 0) * 100) +
-                  '%';
-            }
-          };
-          if (local)
-            Object.assign(options, {
-              workerPath: new URL('vendor/ocr/worker.min.js', location.href).href,
-              corePath: new URL('vendor/ocr/core/', location.href).href,
-              langPath: new URL('vendor/ocr/lang', location.href).href
-            });
-          const created = await T.createWorker(lang, 1, options);
-          if (token !== scanToken || finished) {
-            await created.terminate();
-            return;
-          }
-          worker = created;
-          await worker.setParameters({ preserve_interword_spaces: '1' });
-          return worker.recognize(crop);
-        })();
-        const output = await Promise.race([
-          task,
-          new Promise((_, reject) => {
-            timeout = setTimeout(() => reject(Error('timeout')), 120000);
-          })
-        ]);
+        const engine = await loadOCR();
         if (token !== scanToken) return;
-        result = window.RationLabel.parse(output?.data?.text || '');
+        const outcome = await window.RationOCR.run({
+          image: crop,
+          engine,
+          language: scanLanguage,
+          localBase: cdnOCR() ? null : location.href,
+          signal: scanController.signal,
+          onProgress: (progress) => {
+            if (token !== scanToken) return;
+            if ($('#ocr-progress')) $('#ocr-progress').value = progress.progress || 0;
+            if ($('#ocr-status'))
+              $('#ocr-status').textContent =
+                t(
+                  progress.stage === 'model'
+                    ? 'preparingOCR'
+                    : progress.stage === 'numbers'
+                      ? 'ocrReadingNumbers'
+                      : progress.pass > 1
+                        ? 'ocrOrienting'
+                        : 'ocrReadingRows'
+                ) +
+                ' ' +
+                Math.round((progress.progress || 0) * 100) +
+                '%';
+          }
+        });
+        if (token !== scanToken) return;
+        result = outcome.result;
+        if (outcome.angle) {
+          const rotated = document.createElement('canvas');
+          rotated.width = outcome.angle === 180 ? crop.width : crop.height;
+          rotated.height = outcome.angle === 180 ? crop.height : crop.width;
+          const ctx = rotated.getContext('2d');
+          if (outcome.angle === 90) ctx.translate(rotated.width, 0);
+          else if (outcome.angle === 180) ctx.translate(rotated.width, rotated.height);
+          else ctx.translate(0, rotated.height);
+          ctx.rotate((outcome.angle * Math.PI) / 180);
+          ctx.drawImage(crop, 0, 0);
+          cropPreview = rotated.toDataURL('image/jpeg', 0.88);
+          rotated.width = rotated.height = 1;
+        }
         showReview();
       } catch (error) {
-        if (token === scanToken && scanDialog) {
-          $('#label-stage').innerHTML =
-            `<div class="empty"><p role="alert">${t(error.message === 'load' ? 'ocrUnavailable' : 'ocrError')}</p><button class="btn secondary gap-top" data-label-action="retry">${t('retryLabel')}</button></div>`;
-        }
+        if (token !== scanToken || error.message === 'OCR_ABORT') return;
+        const key =
+          {
+            OCR_MODEL: 'ocrModelError',
+            OCR_MEMORY: 'ocrMemoryError',
+            OCR_TIMEOUT: 'ocrTimeoutError'
+          }[error.message] || 'ocrReadError';
+        $('#label-stage').innerHTML =
+          `<div class="empty"><p role="alert">${t(key)}</p><div class="dialog-actions"><button class="btn secondary" data-label-action="recrop">${t('recropLabel')}</button><button class="btn" data-label-action="retry-recognition">${t('tryAgain')}</button></div></div>`;
       } finally {
-        finished = true;
-        clearTimeout(timeout);
-        if (token === scanToken) {
-          worker?.terminate().catch(() => {});
-          worker = null;
-        }
+        crop.width = crop.height = 1;
       }
     }
     function showReview() {
@@ -369,7 +385,7 @@
         ambiguous = !result.has100 || result.multipleColumns;
       $('#label-title').textContent = t('reviewLabel');
       $('#label-stage').innerHTML =
-        `<form id="label-review-form"><details class="label-proof"><summary>${t('labelPhoto')}</summary><img src="${cropPreview}" alt="${t('yourLabel')}"></details><p class="review-notice">${t(Object.keys(result.values).length ? 'reviewNote' : 'photoUnreadable')}</p>${ambiguous ? `<p class="label-warning">${t('labelAmbiguous')}</p>` : ''}<label>${t('nutritionBasis')}<select name="basis" required><option value="">—</option><option value="g" ${result.basis === 'g' ? 'selected' : ''}>${t('basisG')}</option><option value="ml" ${result.basis === 'ml' ? 'selected' : ''}>${t('basisMl')}</option></select></label><div class="field-grid gap-top">${keys.map((key) => `<label>${t({ kcal: 'labelEnergy', p: 'protein', f: 'fat', c: 'carbs' }[key] || key)} (${t(key === 'kcal' ? 'kcal' : extraKeys.includes(key) ? 'mg' : 'g')})<input name="${key}" type="number" min="0" max="${key === 'kcal' ? 1000 : extraKeys.includes(key) ? 100000 : 100}" step="any" inputmode="decimal" value="${result.values[key] ?? ''}" ${['kcal', 'p', 'f', 'c'].includes(key) ? 'required' : ''} ${result.evidence[key] ? `title="${esc(result.evidence[key])}"` : ''}></label>`).join('')}</div><details class="label-text"><summary>${t('ocrText')}</summary><pre>${esc(result.text.slice(0, 12000))}</pre></details><label class="check-label gap-top"><input name="confirmed" type="checkbox" required><span>${t('confirmLabel')}</span></label><div class="dialog-actions"><button type="button" class="btn secondary" data-label-action="retry">${t('retryLabel')}</button><button class="btn" type="submit">${t('useLabel')}</button></div></form>`;
+        `<form id="label-review-form"><details class="label-proof"><summary>${t('labelPhoto')}</summary><img src="${cropPreview}" alt="${t('yourLabel')}"></details><button type="button" class="text-button" data-label-action="retry">${t('retryLabel')}</button><p class="review-notice">${t(Object.keys(result.values).length ? 'reviewNote' : 'photoUnreadable')}</p>${ambiguous ? `<p class="label-warning">${t('labelAmbiguous')}</p>` : ''}<label>${t('nutritionBasis')}<select name="basis" required><option value="">—</option><option value="g" ${result.basis === 'g' ? 'selected' : ''}>${t('basisG')}</option><option value="ml" ${result.basis === 'ml' ? 'selected' : ''}>${t('basisMl')}</option></select></label><div class="field-grid gap-top">${keys.map((key) => `<label>${t({ kcal: 'labelEnergy', p: 'protein', f: 'fat', c: 'carbs' }[key] || key)} (${t(key === 'kcal' ? 'kcal' : extraKeys.includes(key) ? 'mg' : 'g')})<input name="${key}" type="number" min="0" max="${key === 'kcal' ? 1000 : extraKeys.includes(key) ? 100000 : 100}" step="any" inputmode="decimal" value="${result.values[key] ?? ''}" class="${result.lowConfidence?.includes(key) ? 'ocr-needs-review' : ''}" ${['kcal', 'p', 'f', 'c'].includes(key) ? 'required' : ''} ${result.evidence[key] ? `title="${esc(result.evidence[key])}"` : ''}></label>`).join('')}</div><details class="label-text"><summary>${t('ocrText')}</summary><pre>${esc(result.text.slice(0, 12000))}</pre></details><label class="check-label gap-top"><input name="confirmed" type="checkbox" required><span>${t('confirmLabel')}</span></label><div class="dialog-actions"><button type="button" class="btn secondary" data-label-action="recrop">${t('recropLabel')}</button><button class="btn" type="submit">${t('useLabel')}</button></div></form>`;
     }
     function useResult(form) {
       const data = new FormData(form);
@@ -444,6 +460,7 @@
     return {
       ...base,
       localProfileHTML,
+      privacyCard: privacy.card,
       scanButton,
       addLabelFields,
       beforeRender() {
@@ -476,6 +493,7 @@
         }
       },
       click(button) {
+        if (privacy.click(button)) return true;
         const a = button.dataset.action;
         if (a === 'edit-food') {
           const food = env.find(button.dataset.id || env.context().food?.id) || env.context().food;

@@ -1189,3 +1189,72 @@ dialog select {
   margin-top: 20px;
   padding-top: 14px;
 }
+
+.app-credit {
+  text-align: right;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 26px 2px 8px;
+  letter-spacing: 0.2px;
+}
+.onboarding-legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.onboarding-legal .text-button {
+  font-size: 11px;
+  padding: 0;
+}
+.privacy-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 19px;
+}
+.privacy-card > .between > .icon {
+  color: var(--green);
+}
+.privacy-document {
+  color: #c5d4dd;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.privacy-document section {
+  margin-top: 24px;
+}
+.privacy-document section h3 {
+  color: var(--text);
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.privacy-document p + p {
+  margin-top: 10px;
+}
+.privacy-language {
+  display: flex;
+  gap: 8px;
+}
+.privacy-updated {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 16px;
+}
+.crop-auto-hint {
+  color: var(--green);
+  font-size: 11px;
+  margin: 8px 0;
+}
+.ocr-progress-meta {
+  color: var(--muted);
+  font-size: 11px;
+}
+/* Keep uncertain OCR values visible until the user checks the label. */
+.ocr-needs-review {
+  border-color: #e8b35d !important;
+  box-shadow: 0 0 0 2px #e8b35d24;
+}
