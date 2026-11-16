@@ -400,11 +400,47 @@
     }, API.delay());
   }
   function profileFields(p) {
-    const year = new Date().getFullYear();
-    return `<div class="field-grid"><label>${t('birthYear')}<input name="birthYear" type="number" inputmode="numeric" min="${year - 110}" max="${year - 1}" step="1" value="${p.birthYear || ''}" placeholder="2000" required></label><label>${t('sex')}<select name="sex"><option value="female" ${p.sex === 'female' ? 'selected' : ''}>${t('female')}</option><option value="male" ${p.sex === 'male' ? 'selected' : ''}>${t('male')}</option></select></label><label>${t('height')} (${t('cm')})<input name="height" type="number" inputmode="decimal" min="80" max="230" step=".1" value="${p.height}" required></label><label>${t('weight')} (${t('kg')})<input name="weight" type="number" inputmode="decimal" min="20" max="350" step=".1" value="${p.weight}" required></label></div><label class="gap-top">${t('activity')}<select name="activity">${Array.from({ length: 5 }, (_, i) => `<option value="${i}" ${p.activity === i ? 'selected' : ''}>${t('act' + i)}</option>`).join('')}</select></label><fieldset class="goal-options"><legend>${t('goal')}</legend>${['lose', 'maintain', 'gain'].map((g) => `<label class="goal-option"><input type="radio" name="goal" value="${g}" ${p.goal === g ? 'checked' : ''}><span>${t(g)}</span></label>`).join('')}</fieldset><label class="check-label"><input name="special" type="checkbox" ${p.special ? 'checked' : ''}><span>${t('manualPlan')}</span></label>`;
+    const year = new Date().getFullYear(),
+      manual = !!p.special || !!(state.profile && state.targets.mode === 'manual');
+    return `<div class="field-grid"><label>${t('birthYear')}<select name="birthYear" required><option value="" ${!p.birthYear ? 'selected' : ''} disabled>${t('chooseYear')}</option>${Array.from(
+      { length: 110 },
+      (_, i) => year - 1 - i
+    )
+      .map(
+        (y) =>
+          '<option value="' +
+          y +
+          '" ' +
+          (p.birthYear === y ? 'selected' : '') +
+          '>' +
+          y +
+          '</option>'
+      )
+      .join(
+        ''
+      )}</select></label><label>${t('sex')}<select name="sex" required><option value="" ${!p.sex ? 'selected' : ''} disabled>${t('chooseSex')}</option>${['female', 'male'].map((s) => '<option value="' + s + '" ' + (p.sex === s ? 'selected' : '') + '>' + t(s) + '</option>').join('')}</select></label><label>${t('height')} (${t('cm')})<input name="height" type="number" inputmode="decimal" min="80" max="230" step=".1" value="${p.height ?? ''}" placeholder="175" required></label><label>${t('weight')} (${t('kg')})<input name="weight" type="number" inputmode="decimal" min="20" max="350" step=".1" value="${p.weight ?? ''}" placeholder="60 ${t('kg')}" required></label></div><label class="gap-top">${t('activity')}<select name="activity" required><option value="" ${p.activity == null ? 'selected' : ''} disabled>${t('chooseActivity')}</option>${Array.from({ length: 5 }, (_, i) => '<option value="' + i + '" ' + (p.activity === i ? 'selected' : '') + '>' + t('act' + i) + ' — ' + t('actDetail' + i) + '</option>').join('')}</select></label><p class="field-note activity-note" aria-live="polite">${p.activity == null ? t('activityHelp') : t('actDetail' + p.activity)}</p><details class="activity-guide"><summary>${t('activityGuide')}</summary>${Array.from({ length: 5 }, (_, i) => '<p><strong>' + t('act' + i) + '</strong> — ' + t('actDetail' + i) + '</p>').join('')}</details><fieldset class="goal-options"><legend>${t('goal')}</legend>${['lose', 'maintain', 'gain'].map((g) => '<label class="goal-option"><input type="radio" name="goal" value="' + g + '" ' + (p.goal === g ? 'checked' : '') + '><span>' + t(g) + '</span></label>').join('')}</fieldset><div class="target-weight-field" ${p.goal === 'maintain' ? 'hidden' : ''}><label>${t('targetWeight')} (${t('kg')})<input name="targetWeight" type="number" inputmode="decimal" min="20" max="350" step=".1" placeholder="${p.goal === 'gain' ? '75' : '55'}" value="${p.targetWeight ?? ''}" ${p.goal === 'maintain' ? 'disabled' : ''}></label><p class="field-note">${t('targetWeightHelp')}</p></div><label class="check-label"><input name="special" type="checkbox" ${manual ? 'checked' : ''}><span>${t('manualPlan')}</span></label><p class="field-note">${t('manualPlanHelp')}</p><div class="manual-target-fields field-grid" ${manual ? '' : 'hidden'}>${['kcal', 'p', 'f', 'c'].map((k) => '<label>' + t({ kcal: 'kcal', p: 'protein', f: 'fat', c: 'carbs' }[k]) + '<input name="manual-' + k + '" type="number" inputmode="decimal" min="' + (k === 'kcal' ? 100 : 0) + '" max="' + (k === 'kcal' ? 10000 : 1000) + '" step="any" value="' + (state.targets[k] ?? '') + '" ' + (manual ? 'required' : 'disabled') + '></label>').join('')}</div>`;
+  }
+  function syncProfileFields(form) {
+    const goal = form.querySelector('[name=goal]:checked')?.value || 'maintain',
+      target = form.querySelector('.target-weight-field'),
+      input = form.querySelector('[name=targetWeight]');
+    target.hidden = goal === 'maintain';
+    input.disabled = goal === 'maintain';
+    input.placeholder = goal === 'gain' ? '75' : '55';
+    input.setCustomValidity('');
+    const manual = form.querySelector('[name=special]').checked,
+      fields = form.querySelector('.manual-target-fields');
+    fields.hidden = !manual;
+    for (const field of fields.querySelectorAll('input')) {
+      field.disabled = !manual;
+      field.required = manual;
+    }
+    const activity = form.querySelector('[name=activity]').value;
+    form.querySelector('.activity-note').textContent =
+      activity === '' ? t('activityHelp') : t('actDetail' + activity);
   }
   function renderOnboarding() {
-    app.innerHTML = `<div class="onboarding"><aside class="onboard-art"><div class="art-content">${brand()}<h1>${t('setupTitle')}</h1></div></aside><main class="onboard-main" id="main"><div class="onboard-lang">${['uk', 'ru', 'en'].map((l) => action('lang', l.toUpperCase(), null, 'lang-btn' + (l === state.lang ? ' active' : ''), `data-lang="${l}"`)).join('')}</div><div class="onboard-form"><h2>${t('profile')}</h2><form id="setup-form" class="gap-top">${profileFields({ birthYear: null, sex: 'female', height: 170, weight: 65, activity: 1, goal: 'maintain', special: false })}<button class="btn full gap-top" type="submit">${t('begin')}${icon('arrow')}</button></form><p class="setup-privacy">${icon('lock')}${t('deviceStorage')}</p><div class="onboarding-legal">${action('show-privacy', t('privacyTitle'), null, 'text-button')}<span>© by Gleb</span></div></div></main></div>`;
+    app.innerHTML = `<div class="onboarding"><aside class="onboard-art"><div class="art-content">${brand()}<h1>${t('setupTitle')}</h1></div></aside><main class="onboard-main" id="main"><div class="onboard-lang">${['uk', 'ru', 'en'].map((l) => action('lang', l.toUpperCase(), null, 'lang-btn' + (l === state.lang ? ' active' : ''), `data-lang="${l}"`)).join('')}</div><div class="onboard-form"><h2>${t('profile')}</h2><form id="setup-form" class="gap-top">${profileFields({ birthYear: null, sex: null, height: null, weight: null, activity: null, goal: 'maintain', special: false })}<button class="btn full gap-top" type="submit">${t('begin')}${icon('arrow')}</button></form><p class="setup-privacy">${icon('lock')}${t('deviceStorage')}</p><div class="onboarding-legal">${action('show-privacy', t('privacyTitle'), null, 'text-button')}<span>© by Gleb</span></div></div></main></div>`;
   }
   function settingsHTML() {
     return `${header(t('settings'))}${FUI.localProfileHTML()}<div class="settings-layout"><section class="panel settings-panel"><h2>${t('nutritionParameters')}</h2><form id="edit-profile-form" class="gap-top">${profileFields(state.profile)}<button class="btn gap-top" type="submit">${t('saveProfile')}</button></form></section><section class="panel settings-panel" id="target-settings"><div class="between"><h2>${t('targets')}</h2>${ib('recalculate', 'activity', t('restoreAuto'))}</div><form id="targets-form" class="gap-top"><div class="settings-grid">${[
@@ -435,10 +471,18 @@
       )
       .join(
         ''
-      )}</section><section class="panel settings-panel"><h2>${t('data')}</h2><div class="data-buttons">${action('export', t('export'), 'download', 'btn secondary')}<label class="btn secondary file-label">${icon('upload')}${t('import')}<input id="import-file" type="file" accept="application/json,.json"></label>${action('import-catalog', t('importCatalog'), 'food', 'btn secondary')}</div><p class="help gap-top">${t('dataNote')}</p><details class="danger-zone"><summary>${t('reset')}</summary>${action('reset', t('reset'), 'trash', 'btn danger gap-top')}</details></section>${FUI.privacyCard()}<section class="panel settings-panel"><div class="between"><h2>${t('about')}</h2><span class="pill">4.1</span></div><div class="about-links"><a href="https://www.tablycjakalorijnosti.com.ua/tablytsya-yizhyi" target="_blank" rel="noopener">Таблиця Калорійності ↗</a><a href="https://fdc.nal.usda.gov" target="_blank" rel="noopener">USDA ↗</a><a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts ↗</a></div><p class="source-foot">USDA: public domain · Open Food Facts: ODbL</p>${action('install', t('install'), 'download', 'btn secondary full gap-top')}</section></div>`;
+      )}</section><section class="panel settings-panel"><h2>${t('data')}</h2><div class="data-buttons">${action('export', t('export'), 'download', 'btn secondary')}<label class="btn secondary file-label">${icon('upload')}${t('import')}<input id="import-file" type="file" accept="application/json,.json"></label>${action('import-catalog', t('importCatalog'), 'food', 'btn secondary')}</div><p class="help gap-top">${t('dataNote')}</p><details class="danger-zone"><summary>${t('reset')}</summary>${action('reset', t('reset'), 'trash', 'btn danger gap-top')}</details></section>${FUI.privacyCard()}<section class="panel settings-panel"><div class="between"><h2>${t('about')}</h2><span class="pill">4.2</span></div><div class="about-links"><a href="https://www.tablycjakalorijnosti.com.ua/tablytsya-yizhyi" target="_blank" rel="noopener">Таблиця Калорійності ↗</a><a href="https://fdc.nal.usda.gov" target="_blank" rel="noopener">USDA ↗</a><a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts ↗</a></div><p class="source-foot">USDA: public domain · Open Food Facts: ODbL</p>${action('install', t('install'), 'download', 'btn secondary full gap-top')}</section></div>`;
   }
   function progressHTML() {
-    return FUI.statsHTML();
+    const p = state.profile,
+      current = state.weights.length
+        ? [...state.weights].sort((a, b) => b.date.localeCompare(a.date))[0].value
+        : p.weight;
+    const goal =
+      p.targetWeight == null
+        ? ''
+        : `<section class="panel weight-goal-card"><div class="between"><h2>${t('targetWeight')}</h2><strong>${fmt(p.targetWeight, 1)} ${t('kg')}</strong></div><p class="field-note">${t('weight')}: ${fmt(current, 1)} ${t('kg')} · ${t('toGoal')}: ${fmt(Math.max(0, p.goal === 'lose' ? current - p.targetWeight : p.targetWeight - current))} ${t('kg')}</p></section>`;
+    return goal + FUI.statsHTML();
   }
 
   function stopScanner() {
@@ -1207,6 +1251,7 @@
   });
   document.addEventListener('change', (e) => {
     const el = e.target;
+    if (el.closest('#setup-form,#edit-profile-form')) syncProfileFields(el.closest('form'));
     if (el.id === 'portion-unit') {
       FUI.syncUnits(true);
       refreshPortion();
@@ -1247,7 +1292,11 @@
       weight: Number(f.get('weight')),
       activity: Number(f.get('activity')),
       goal: String(f.get('goal')),
-      special: f.get('special') === 'on'
+      special: f.get('special') === 'on',
+      targetWeight:
+        f.get('goal') === 'maintain' || !f.get('targetWeight')
+          ? null
+          : Number(f.get('targetWeight'))
     };
   }
   document.addEventListener('submit', async (e) => {
@@ -1265,9 +1314,26 @@
           toast(t('required'), true);
           break;
         }
+        if (
+          p.targetWeight != null &&
+          ((p.goal === 'lose' && p.targetWeight >= p.weight) ||
+            (p.goal === 'gain' && p.targetWeight <= p.weight))
+        ) {
+          const target = form.querySelector('[name=targetWeight]');
+          target.setCustomValidity(t('targetWeightDirection'));
+          target.reportValidity();
+          break;
+        }
         const first = !state.profile;
         state.profile = p;
-        if (first || state.targets.mode !== 'manual') state.targets = C.calculate(p);
+        if (p.special) {
+          state.targets = {
+            mode: 'manual',
+            ...Object.fromEntries(
+              ['kcal', 'p', 'f', 'c'].map((k) => [k, Number(f.get('manual-' + k))])
+            )
+          };
+        } else state.targets = C.calculate(p);
         if (first) state.weights.push({ date: C.dateKey(), value: p.weight });
         persist();
         render();

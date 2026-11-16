@@ -149,16 +149,97 @@
     }
     return best;
   }
+  function outlinedTable(image) {
+    const { width: w, height: h } = image,
+      { gray } = grayscale(image),
+      n = w * h;
+    let best = null,
+      bestScore = 0;
+    for (const threshold of [75, 100, 125]) {
+      const seen = new Uint8Array(n),
+        queue = new Int32Array(n);
+      for (let start = 0; start < n; start++) {
+        if (seen[start] || gray[start] > threshold) continue;
+        let head = 0,
+          tail = 1,
+          left = w,
+          right = 0,
+          top = h,
+          bottom = 0;
+        queue[0] = start;
+        seen[start] = 1;
+        while (head < tail) {
+          const i = queue[head++],
+            x = i % w,
+            y = Math.floor(i / w);
+          left = Math.min(left, x);
+          right = Math.max(right, x);
+          top = Math.min(top, y);
+          bottom = Math.max(bottom, y);
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++) {
+              const xx = x + dx,
+                yy = y + dy,
+                q = yy * w + xx;
+              if (xx < 0 || xx >= w || yy < 0 || yy >= h || seen[q] || gray[q] > threshold)
+                continue;
+              seen[q] = 1;
+              queue[tail++] = q;
+            }
+        }
+        const rw = right - left,
+          rh = bottom - top;
+        if (rw < w * 0.23 || rh < h * 0.12 || rw / rh < 0.5 || rw / rh > 4 || tail > rw * rh * 0.5)
+          continue;
+        const edge = (side) => {
+          let hit = 0,
+            total = 0;
+          for (let t = 0.05; t < 0.95; t += 0.02) {
+            const x = side < 2 ? (side === 0 ? left : right) : left + rw * t,
+              y = side < 2 ? top + rh * t : side === 2 ? top : bottom;
+            total++;
+            let found = false;
+            for (let dy = -3; dy <= 3; dy++)
+              for (let dx = -3; dx <= 3; dx++) {
+                const xx = Math.round(x) + dx,
+                  yy = Math.round(y) + dy;
+                if (xx >= 0 && xx < w && yy >= 0 && yy < h && gray[yy * w + xx] <= threshold)
+                  found = true;
+              }
+            if (found) hit++;
+          }
+          return hit / total;
+        };
+        const quality = Math.min(...[0, 1, 2, 3].map(edge)),
+          score = quality * rw * rh;
+        if (quality < 0.72 || score <= bestScore) continue;
+        bestScore = score;
+        const x = Math.max(0, left - 8),
+          y = Math.max(0, top - 8);
+        best = {
+          x: x / w,
+          y: y / h,
+          w: (Math.min(w, right + 8) - x) / w,
+          h: (Math.min(h, bottom + 8) - y) / h,
+          confidence: quality
+        };
+      }
+    }
+    return best;
+  }
   function detectTable(canvas) {
     const small = document.createElement('canvas'),
-      scale = Math.min(1, 400 / Math.max(canvas.width, canvas.height));
+      scale = Math.min(1, 800 / Math.max(canvas.width, canvas.height));
     small.width = Math.round(canvas.width * scale);
     small.height = Math.round(canvas.height * scale);
     const ctx = small.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(canvas, 0, 0, small.width, small.height);
-    return findTableRect(ctx.getImageData(0, 0, small.width, small.height));
+    const pixels = ctx.getImageData(0, 0, small.width, small.height),
+      result = outlinedTable(pixels) || findTableRect(pixels);
+    return result?.confidence >= 0.9 && result.h >= 0.45 && result.w >= 0.45 ? result : null;
   }
   function preparePixels(image, mode = 'contrast') {
+    if (mode === 'raw') return image;
     const { gray, hist, width, height } = grayscale(image),
       data = new Uint8ClampedArray(width * height * 4),
       n = gray.length;
@@ -325,9 +406,296 @@
     ctx.putImageData(pixels, 0, 0);
     return canvas;
   }
+  function energyRegion(data, image) {
+    const words = root.RationLabel.wordsFrom(data),
+      energy = words.filter((w) => /ккал|kcal|kkal|kkan|keal/i.test(w.text));
+    if (!energy.length) return null;
+    energy.sort((a, b) => b.confidence - a.confidence);
+    const e = energy[0],
+      h = Math.max(12, e.bbox.y1 - e.bbox.y0),
+      cy = (e.bbox.y0 + e.bbox.y1) / 2;
+    const line = words.filter(
+        (w) =>
+          Math.abs((w.bbox.y0 + w.bbox.y1) / 2 - cy) < h * 1.5 &&
+          w.bbox.x0 < e.bbox.x1 &&
+          w.text.length > 2
+      ),
+      header = words
+        .filter((w) => /100/.test(w.text) && w.bbox.y0 < e.bbox.y0 && e.bbox.y0 - w.bbox.y0 < h * 7)
+        .sort((a, b) => b.bbox.y0 - a.bbox.y0)[0];
+    const x = Math.max(
+        0,
+        Math.floor(Math.min(...line.map((w) => w.bbox.x0), e.bbox.x0 - h * 14) - h)
+      ),
+      y = Math.max(0, Math.floor(header ? header.bbox.y0 - h * 2 : e.bbox.y0 - h * 4)),
+      right = Math.min(image.width, Math.ceil(e.bbox.x1 + h * 3)),
+      bottom = Math.min(image.height, Math.ceil(e.bbox.y1 + h * 22));
+    return right - x > 100 && bottom - y > 100
+      ? { x, y, width: right - x, height: bottom - y }
+      : null;
+  }
+  function semanticRegion(data, image) {
+    const words = root.RationLabel.wordsFrom(data),
+      anchors = [];
+    for (const word of words) {
+      const key = Object.entries(root.RationLabel.patterns).find(([, rx]) =>
+        rx.test(word.text)
+      )?.[0];
+      if (key && word.confidence !== 0)
+        anchors.push({ key, word, y: (word.bbox.y0 + word.bbox.y1) / 2 });
+    }
+    anchors.sort((a, b) => a.y - b.y);
+    const clusters = [];
+    for (const anchor of anchors) {
+      const h = anchor.word.bbox.y1 - anchor.word.bbox.y0;
+      let c = clusters.at(-1);
+      if (!c || anchor.y - c.at > Math.max(40, h * 5)) {
+        c = { at: anchor.y, anchors: [] };
+        clusters.push(c);
+      }
+      c.anchors.push(anchor);
+      c.at = anchor.y;
+    }
+    const score = (c) =>
+      new Set(c.anchors.map((a) => a.key)).size +
+      new Set(c.anchors.filter((a) => ['p', 'f', 'c'].includes(a.key)).map((a) => a.key)).size * 3;
+    clusters.sort((a, b) => score(b) - score(a));
+    const c = clusters[0];
+    if (!c || new Set(c.anchors.map((a) => a.key)).size < 3) return null;
+    const a = c.anchors.map((a) => a.word),
+      hs = a.map((w) => w.bbox.y1 - w.bbox.y0).sort((a, b) => a - b),
+      h = hs[Math.floor(hs.length / 2)],
+      top = Math.min(...a.map((w) => w.bbox.y0)),
+      bottom = Math.max(...a.map((w) => w.bbox.y1)),
+      left = Math.min(...a.map((w) => w.bbox.x0));
+    const nearby = words.filter(
+      (w) =>
+        w.bbox.y0 > top - h * 3 &&
+        w.bbox.y1 < bottom + h * 3 &&
+        w.bbox.x0 > left &&
+        /^\d/.test(w.text) &&
+        Number(w.text.match(/^\d+(?:[.,]\d+)?/)?.[0].replace(',', '.')) <= 1000
+    );
+    const x = Math.max(0, Math.floor(left - h)),
+      y = Math.max(0, Math.floor(top - h * 5)),
+      right = Math.min(
+        image.width,
+        Math.ceil(Math.max(...a.concat(nearby).map((w) => w.bbox.x1)) + h * 2)
+      ),
+      end = Math.min(image.height, Math.ceil(bottom + h * 3));
+    return right - x > 100 && end - y > 100 ? { x, y, width: right - x, height: end - y } : null;
+  }
+  function scalePixels(image, factor) {
+    const canvas = asCanvas(image),
+      large = document.createElement('canvas');
+    large.width = Math.round(image.width * factor);
+    large.height = Math.round(image.height * factor);
+    large.getContext('2d').drawImage(canvas, 0, 0, large.width, large.height);
+    return large.getContext('2d').getImageData(0, 0, large.width, large.height);
+  }
+  function decimalPosition(image) {
+    const { gray, hist, width: w, height: h } = grayscale(image),
+      threshold = otsu(hist, w * h),
+      votes = [];
+    for (const limit of [threshold - 16, threshold, threshold + 16]) {
+      const seen = new Uint8Array(w * h),
+        queue = new Int32Array(w * h),
+        parts = [];
+      for (let start = 0; start < gray.length; start++) {
+        if (seen[start] || gray[start] > limit) continue;
+        let head = 0,
+          tail = 1,
+          x0 = w,
+          x1 = 0,
+          y0 = h,
+          y1 = 0;
+        seen[start] = 1;
+        queue[0] = start;
+        while (head < tail) {
+          const i = queue[head++],
+            x = i % w,
+            y = Math.floor(i / w);
+          x0 = Math.min(x0, x);
+          x1 = Math.max(x1, x);
+          y0 = Math.min(y0, y);
+          y1 = Math.max(y1, y);
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++) {
+              const xx = x + dx,
+                yy = y + dy,
+                q = yy * w + xx;
+              if (xx < 0 || xx >= w || yy < 0 || yy >= h || seen[q] || gray[q] > limit) continue;
+              seen[q] = 1;
+              queue[tail++] = q;
+            }
+        }
+        if (tail > 2 && tail < w * h * 0.4)
+          parts.push({ x0, x1, y0, y1, area: tail, height: y1 - y0 + 1 });
+      }
+      const maxH = Math.max(1, ...parts.map((p) => p.height)),
+        digits = parts
+          .filter((p) => p.height > maxH * 0.62 && p.area > maxH * 0.2)
+          .sort((a, b) => a.x0 - b.x0);
+      if (digits.length < 2 || digits.length > 6) continue;
+      const baseline = Math.max(...digits.map((p) => p.y1));
+      for (let i = 1; i < digits.length; i++) {
+        const a = digits[i - 1],
+          b = digits[i];
+        if (
+          parts.some(
+            (p) =>
+              p.x0 > a.x1 &&
+              p.x1 < b.x0 &&
+              p.height < maxH * 0.4 &&
+              p.x1 - p.x0 < maxH * 0.3 &&
+              p.y0 > baseline - maxH * 0.27 &&
+              p.y1 < baseline + maxH * 0.4 &&
+              p.area < Math.min(a.area, b.area) * 0.3
+          )
+        )
+          votes.push({ position: i, digits: digits.length });
+      }
+    }
+    return (
+      votes.find(
+        (a) => votes.filter((b) => a.position === b.position && a.digits === b.digits).length >= 2
+      ) || null
+    );
+  }
+  function symbolReading(image, word) {
+    const sequence = [];
+    for (const symbol of word.symbols || []) {
+      if (!/^[0-9.,]$/.test(symbol.text)) break;
+      if (symbol.bbox.x1 - symbol.bbox.x0 < 3) continue;
+      sequence.push(symbol);
+    }
+    if (sequence.length < 2) return null;
+    const tall = sequence
+        .filter((s) => /\d/.test(s.text))
+        .map((s) => s.bbox.y1 - s.bbox.y0)
+        .sort((a, b) => a - b),
+      height = tall[Math.floor(tall.length / 2)];
+    const firstHeight = sequence[0].bbox.y1 - sequence[0].bbox.y0,
+      fontHeight = Math.min(
+        ...sequence
+          .filter((s) => /^\d$/.test(s.text) && s.bbox.y1 - s.bbox.y0 > firstHeight * 0.5)
+          .slice(0, 2)
+          .map((s) => s.bbox.y1 - s.bbox.y0)
+      );
+    let text = '',
+      verified = false;
+    for (let i = 0; i < sequence.length; i++) {
+      const symbol = sequence[i],
+        b = symbol.bbox,
+        next = sequence[i + 1],
+        h = b.y1 - b.y0;
+      if (i > 0 && next && h < height * 0.4 && b.y0 > next.bbox.y1 - height * 0.4) {
+        text += '.';
+        verified = true;
+        continue;
+      }
+      if (
+        i > 0 &&
+        text.includes('.') &&
+        /^\d$/.test(symbol.text) &&
+        h < fontHeight * 0.8 &&
+        b.x0 - sequence[i - 1].bbox.x1 > fontHeight * 0.24
+      )
+        break;
+      text += symbol.text.replace(',', '.');
+      if (/[.,]/.test(symbol.text)) verified = true;
+      if (!next || !/^\d$/.test(symbol.text) || !/^\d$/.test(next.text)) continue;
+      const baseline = Math.min(b.y1, next.bbox.y1),
+        x0 = Math.round(b.x0 + (b.x1 - b.x0) * 0.62),
+        x1 = Math.round(next.bbox.x0),
+        y0 = Math.round(baseline + height * 0.05),
+        y1 = Math.round(baseline + height * 0.3);
+      let votes = 0;
+      for (const threshold of [90, 115, 140]) {
+        let ink = 0;
+        for (let y = y0; y < Math.min(image.height, y1); y++)
+          for (let x = Math.max(0, x0); x < Math.min(image.width, x1); x++) {
+            const p = (y * image.width + x) * 4;
+            if (Math.max(image.data[p], image.data[p + 1], image.data[p + 2]) < threshold) ink++;
+          }
+        if (ink >= 3 && ink < height * height * 0.08) votes++;
+      }
+      if (votes >= 2) {
+        text += '.';
+        verified = true;
+      }
+    }
+    if (!verified || !/^\d+\.\d+$/.test(text)) return null;
+    const confidence = Math.min(
+      ...sequence.filter((s) => s.bbox.y1 - s.bbox.y0 > height * 0.5).map((s) => s.confidence || 0)
+    );
+    return confidence >= 85
+      ? {
+          value: Number(text),
+          text,
+          decimal: true,
+          confidence,
+          review: true,
+          correctedPunctuation: !sequence.some((s) => /[.,]/.test(s.text))
+        }
+      : null;
+  }
+  function chooseNumber(reads, initial) {
+    const valid = reads.filter((r) => r && !r.ambiguous),
+      groups = new Map();
+    for (const r of valid) {
+      const k = String(r.value);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(r);
+    }
+    const ranked = [...groups.values()].sort(
+      (a, b) =>
+        b.length - a.length ||
+        Math.max(...b.map((r) => r.confidence)) - Math.max(...a.map((r) => r.confidence))
+    );
+    if (!ranked.length) return null;
+    const decimals = ranked.filter((g) => g[0].decimal);
+    let top = ranked[0];
+    // A decimal reading is stronger evidence than the same digits with punctuation lost.
+    for (const g of decimals)
+      if (top[0].text.replace(/[.,]/g, '') === g[0].text.replace(/[.,]/g, '')) top = g;
+    const conflict = ranked.some((g) => g !== top && g[0].value !== top[0].value),
+      winner = top.reduce((a, b) => (a.confidence > b.confidence ? a : b));
+    if (
+      winner.decimal &&
+      valid.some(
+        (r) =>
+          r.decimal &&
+          r.confidence >= 55 &&
+          r.value !== winner.value &&
+          String(winner.value).startsWith(String(r.value))
+      )
+    )
+      return null;
+    if (conflict && top.length < 2 && winner.confidence < 70) return null;
+    if (
+      !winner.decimal &&
+      Number.isFinite(initial) &&
+      initial % 1 !== 0 &&
+      String(initial).replace('.', '') === winner.text
+    )
+      return { ...winner, value: initial, decimal: true, review: true };
+    return { ...winner, review: conflict || top.length < 2 || winner.confidence < 65 };
+  }
+  const regionQuality = (item) =>
+    (item.word.confidence || 0) +
+    (/[.,]/.test(item.word.text) ? 20 : 0) -
+    (!/^\d/.test(item.word.text) ? 25 : 0);
   function numericRegions(data) {
     const L = root.RationLabel,
-      rows = L.wordRows(data),
+      rows = [
+        ...(data.blocks || []).flatMap((b) =>
+          (b.paragraphs || []).flatMap((p) =>
+            (p.lines || []).map((l) => ({ words: l.words || [] }))
+          )
+        ),
+        ...L.wordRows(data)
+      ],
       all = L.wordsFrom(data),
       maxX = Math.max(1, ...all.map((w) => w.bbox?.x1 || 0)),
       candidates = [];
@@ -338,7 +706,7 @@
       if (!key && /ккал|kcal|energy|енергетич|энергетич/i.test(text)) key = 'kcal';
       if (!key) continue;
       const numbers = row.words.filter(
-        (word) => /^\d/.test(word.text) && word.bbox.x0 >= maxX * 0.48
+        (word) => /^(?:\d|[OoОоIlL](?=[\d.,мМгg])|ОМ)/.test(word.text) && word.bbox.x0 >= maxX * 0.4
       );
       for (let i = 0; i < numbers.length; i++) {
         let word = numbers[i];
@@ -364,7 +732,8 @@
           i++;
         }
         const n = Number(word.text.match(/^\d+(?:[.,]\d+)?/)?.[0].replace(',', '.'));
-        if (key === 'kcal' && (n > 1000 || !/ккал|kcal/i.test(text))) continue;
+        if (key === 'kcal' && (n > 1000 || /кдж|kj/i.test(word.text) || !/ккал|kcal/i.test(text)))
+          continue;
         candidates.push({ key, word, text });
       }
     }
@@ -372,7 +741,9 @@
     for (const item of candidates) {
       const x = item.word.bbox.x0,
         h = item.word.bbox.y1 - item.word.bbox.y0;
-      let cluster = clusters.find((c) => Math.abs(c.x - x) < Math.max(15, h));
+      let cluster = clusters
+        .filter((c) => Math.abs(c.x - x) < Math.max(15, h * 0.7))
+        .sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
       if (!cluster) {
         cluster = { x, items: [] };
         clusters.push(cluster);
@@ -380,20 +751,32 @@
       cluster.items.push(item);
       cluster.x = cluster.items.reduce((s, r) => s + r.word.bbox.x0, 0) / cluster.items.length;
     }
-    clusters.sort((a, b) => b.items.length - a.items.length);
+    const rank = (c) => new Set(c.items.map((i) => i.key)).size;
+    clusters.sort((a, b) => rank(b) - rank(a) || b.items.length - a.items.length);
     if (
       !clusters.length ||
-      (clusters[1]?.items.length >= 3 &&
-        clusters[1].items.length >= clusters[0].items.length * 0.65)
+      (clusters[1] && rank(clusters[1]) >= 3 && rank(clusters[1]) >= rank(clusters[0]) * 0.8)
     )
       return [];
-    return [...new Map(clusters[0].items.map((item) => [item.key, item])).values()];
+    const unique = new Map();
+    for (const item of clusters[0].items) {
+      const old = unique.get(item.key);
+      if (!old || regionQuality(item) > regionQuality(old)) unique.set(item.key, item);
+    }
+    if (!unique.has('kcal')) {
+      const energy = candidates
+        .filter((i) => i.key === 'kcal')
+        .sort((a, b) => regionQuality(b) - regionQuality(a))[0];
+      if (energy) unique.set('kcal', energy);
+    }
+    return [...unique.values()];
   }
   function digitRegion(image, word) {
     const b = word.bbox,
       symbols = word.symbols || [],
       heights = symbols.filter((s) => /\d/.test(s.text)).map((s) => s.bbox.y1 - s.bbox.y0),
       maxH = Math.max(...heights, 1);
+    const lastNumeric = symbols.findLastIndex((s) => /^\d$/.test(s.text));
     let end = b.x1;
     for (let i = 0; i < symbols.length; i++) {
       const s = symbols[i],
@@ -401,7 +784,7 @@
       if (
         i > 0 &&
         !/^[.,]$/.test(s.text) &&
-        (!/^\d$/.test(s.text) || (h < maxH * 0.78 && h > maxH * 0.3))
+        (/^[gгrкk(]$/i.test(s.text) || (i === lastNumeric && i > 1 && h < maxH * 0.55))
       ) {
         end = s.bbox.x0 - 1;
         break;
@@ -423,7 +806,16 @@
   }
   async function refineNumbers(worker, pixels, best, signal, onProgress) {
     const L = root.RationLabel,
-      regions = numericRegions(best.data),
+      regions = [
+        ...(best.sources || [best.data])
+          .flatMap((data) => numericRegions(data))
+          .reduce((map, item) => {
+            const old = map.get(item.key);
+            if (!old || regionQuality(item) > regionQuality(old)) map.set(item.key, item);
+            return map;
+          }, new Map())
+          .values()
+      ],
       fields = {},
       notes = [];
     if (regions.length < 3) return;
@@ -440,8 +832,9 @@
         part = cropPixels(pixels, region),
         original = asCanvas(part),
         large = document.createElement('canvas');
-      large.width = Math.max(1, Math.round(part.width * 3));
-      large.height = Math.max(1, Math.round(part.height * 3));
+      const digitScale = Math.min(3, 80 / part.height);
+      large.width = Math.max(1, Math.round(part.width * digitScale));
+      large.height = Math.max(1, Math.round(part.height * digitScale));
       large.getContext('2d').drawImage(original, 0, 0, large.width, large.height);
       const raw = large
           .getContext('2d', { willReadFrequently: true })
@@ -450,33 +843,82 @@
       const read = async (canvas) => {
         const { data } = await worker.recognize(canvas, {}, { text: true });
         const number = data.text.trim().replace(/\s/g, '');
-        if (!/^(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(number) || /^0\d+$/.test(number)) return null;
+        if (!/^(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(number)) return null;
         return {
+          ambiguous: /^0\d+$/.test(number),
           value: Number(number.replace(',', '.')),
           confidence: data.confidence,
           decimal: /[.,]/.test(number),
           text: number
         };
       };
-      let value = await read(paper);
-      if (!value || value.confidence < 55) {
-        const alternate = await read(large);
-        if (alternate) {
-          if (!value) value = alternate;
-          else if (value.value !== alternate.value) {
-            notes.push(key);
-            if (!value.decimal && alternate.decimal) value = alternate;
-          } else if (alternate.confidence > value.confidence) value = alternate;
+      const contrast = asCanvas(preparePixels(raw, 'contrast'));
+      const reads = [await read(large), await read(contrast), await read(paper)];
+      const marker = key === 'kcal' ? null : decimalPosition(raw);
+      const recover = (r) => {
+        if (r && !r.decimal && marker && r.text.length === marker.digits) {
+          const text = r.text.slice(0, marker.position) + '.' + r.text.slice(marker.position);
+          return { ...r, text, value: Number(text), decimal: true, ambiguous: false };
         }
+        return r;
+      };
+      for (let j = 0; j < reads.length; j++) reads[j] = recover(reads[j]);
+      const initial = best.result.values[key];
+      if (Number.isFinite(initial))
+        reads.push({
+          value: initial,
+          text: String(initial),
+          decimal: initial % 1 !== 0,
+          confidence: word.confidence || 0
+        });
+      let value = chooseNumber(reads, best.result.values[key]);
+      if (!value || value.review) {
+        await worker.setParameters({ tessedit_pageseg_mode: '13' });
+        reads.push(recover(await read(contrast)));
+        await worker.setParameters({ tessedit_pageseg_mode: '7' });
+        value = chooseNumber(reads, best.result.values[key]);
+      }
+      if (value?.review) notes.push(key);
+      contrast.width = contrast.height = 1;
+      if (!value) {
+        delete best.result.values[key];
+        best.result.uncertain.push(key);
+        notes.push(key);
+      }
+      let symbolic = symbolReading(pixels, word);
+      const decimalDisagreement = value?.decimal && symbolic && value.value !== symbolic.value;
+      if (decimalDisagreement) {
+        value = null;
+        symbolic = null;
+        notes.push(key);
+      }
+      if (
+        symbolic &&
+        reads.some(
+          (r) =>
+            r &&
+            r.decimal &&
+            r.confidence >= 55 &&
+            r.value !== symbolic.value &&
+            String(symbolic.value).startsWith(String(r.value))
+        )
+      )
+        symbolic = null;
+      if (
+        symbolic &&
+        key !== 'kcal' &&
+        (symbolic.correctedPunctuation ||
+          !value ||
+          value.confidence < 50 ||
+          symbolic.value === value.value)
+      ) {
+        value = symbolic;
+        notes.push(key);
       }
       if (!value) {
-        await worker.setParameters({ tessedit_pageseg_mode: '13' });
-        const contrast = asCanvas(preparePixels(raw, 'contrast'));
-        value = await read(contrast);
-        if (!value) value = await read(paper);
-        contrast.width = contrast.height = 1;
-        await worker.setParameters({ tessedit_pageseg_mode: '7' });
-        if (value) notes.push(key);
+        delete best.result.values[key];
+        best.result.uncertain.push(key);
+        notes.push(key);
       }
       const micro = ['calcium', 'iron', 'potassium', 'vitaminC', 'sodium'].includes(key);
       if (value) {
@@ -516,10 +958,7 @@
     }
     best.result.lowConfidence = [...new Set(notes)];
     best.result.fieldConfidence = fields;
-    if (
-      !best.result.uncertain.length &&
-      L.core.every((key) => Number.isFinite(best.result.values[key]))
-    )
+    if (L.core.every((key) => Number.isFinite(best.result.values[key])))
       best.result.multipleColumns = false;
   }
 
@@ -565,6 +1004,7 @@
         langPath: new URL('vendor/ocr/lang', localBase).href
       });
     let best = null;
+    const readings = [];
     signal?.addEventListener('abort', abort, { once: true });
     try {
       const job = (async () => {
@@ -578,14 +1018,15 @@
         stage = 'read';
         await worker.setParameters({
           preserve_interword_spaces: '1',
-          tessedit_pageseg_mode: '6',
+          tessedit_pageseg_mode: '11',
           user_defined_dpi: '300'
         });
-        const attempt = async (mode, angle) => {
+        const attempt = async (mode, angle, regionPixels) => {
           check();
           pass++;
           onProgress({ stage: 'read', progress: 0, pass, angle });
-          const oriented = preparePixels(rotatePixels(pixels, angle), mode),
+          const readPixels = regionPixels || rotatePixels(pixels, angle);
+          const oriented = preparePixels(readPixels, mode),
             canvas = asCanvas(oriented);
           const { data } = await worker.recognize(
             canvas,
@@ -599,6 +1040,7 @@
             ).length,
             candidate = {
               result,
+              pixels: readPixels,
               angle,
               mode,
               confidence: data.confidence,
@@ -606,6 +1048,7 @@
               passes: pass,
               data
             };
+          readings.push(candidate);
           if (
             !best ||
             candidate.score > best.score ||
@@ -613,11 +1056,31 @@
           )
             best = candidate;
           canvas.width = canvas.height = 1;
-          return labels >= 4;
+          return (
+            labels >= 4 || (Number.isFinite(result.values.kcal) && /ккал|kcal/i.test(result.text))
+          );
         };
-        for (const angle of [0, 90, 270, 180]) if (await attempt('paper', angle)) break;
+        for (const angle of [0, 90, 270, 180]) if (await attempt('raw', angle)) break;
         if (best) {
-          const oriented = rotatePixels(pixels, best.angle);
+          const oriented = best.pixels,
+            region = energyRegion(best.data, oriented) || semanticRegion(best.data, oriented),
+            part = region ? cropPixels(oriented, region) : oriented,
+            factor = Math.min(
+              3,
+              Math.max(1, 1400 / part.width),
+              2300 / Math.max(part.width, part.height)
+            ),
+            enlarged = scalePixels(part, factor),
+            angle = best.angle;
+          await worker.setParameters({ tessedit_pageseg_mode: '6' });
+          if (region) best = null;
+          await attempt('raw', angle, enlarged);
+          await attempt('contrast', angle, enlarged);
+          await attempt('paper', angle, enlarged);
+        }
+        if (best) {
+          const oriented = best.pixels;
+          best.sources = readings.filter((r) => r.pixels === best.pixels).map((r) => r.data);
           await refineNumbers(worker, oriented, best, signal, onProgress);
           if (!best.result.basis) {
             await worker.reinitialize(language, 1);
@@ -694,6 +1157,12 @@
     preparePixels,
     rotatePixels,
     grayscale,
+    energyRegion,
+    outlinedTable,
+    semanticRegion,
+    symbolReading,
+    decimalPosition,
+    chooseNumber,
     numericRegions,
     digitRegion,
     cropPixels

@@ -1258,3 +1258,280 @@ dialog select {
   border-color: #e8b35d !important;
   box-shadow: 0 0 0 2px #e8b35d24;
 }
+
+[hidden] {
+  display: none !important;
+}
+.target-weight-field {
+  margin: 0 0 20px;
+}
+.manual-target-fields {
+  margin-top: 16px;
+}
+.weight-goal-card {
+  margin-bottom: 20px;
+}
+.activity-note {
+  min-height: 2.4em;
+}
+input::placeholder {
+  color: #82929e;
+  opacity: 0.7;
+}
+
+.activity-guide {
+  margin: 10px 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.activity-guide p {
+  margin-top: 9px;
+  color: var(--muted);
+}
+.activity-guide summary {
+  cursor: pointer;
+  color: var(--green);
+}
+
+/* Version 4.2: quiet surfaces, clear forms, unobstructed label review. */
+:root {
+  --green: #94e4c6;
+}
+.panel {
+  box-shadow: 0 12px 34px #02070d18;
+  border-color: #40536355;
+}
+.onboard-main {
+  background: radial-gradient(ellipse at 90% 5%, #86dabc0b, transparent 65%), #101922;
+}
+.onboard-form {
+  max-width: 490px;
+  width: 100%;
+}
+.onboard-form h2 {
+  font-size: 29px;
+  letter-spacing: -0.7px;
+  margin-bottom: 26px;
+}
+.onboard-form input,
+.onboard-form select,
+#edit-profile-form input,
+#edit-profile-form select {
+  min-height: 52px;
+  border-radius: 14px;
+  background: #101b25;
+  border-color: #42546188;
+}
+.onboard-form label,
+#edit-profile-form label {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.goal-options {
+  margin-top: 22px;
+}
+.goal-option {
+  border-radius: 13px;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.goal-option:has(input:checked) {
+  border-color: #94e4c6;
+  background: #94e4c612;
+}
+.manual-target-fields {
+  padding: 16px;
+  border: 1px solid #94e4c636;
+  border-radius: 16px;
+  background: #94e4c606;
+}
+.weight-goal-card strong {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  color: var(--green);
+}
+.label-scanner {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 25px;
+  border: 1px solid #4b6072;
+  background: #14202b;
+  box-shadow: 0 28px 100px #0008;
+}
+.label-scanner[open] {
+  display: flex;
+  flex-direction: column;
+}
+.label-scanner .dialog-head {
+  position: static;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 22px 24px;
+  border-bottom: 1px solid #ffffff0c;
+  background: #172430;
+}
+.label-scanner .dialog-head h2 {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+}
+.label-scanner #label-stage {
+  padding: 21px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  scrollbar-width: thin;
+}
+.label-scanner .dialog-actions {
+  position: static;
+  bottom: auto;
+  margin-top: 22px;
+  padding: 20px 0 0;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 10px;
+}
+.label-scanner .dialog-actions .btn {
+  padding: 13px 12px;
+  min-height: 49px;
+  font-size: 14px;
+  border-radius: 13px;
+}
+.scan-summary {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #94e4c629;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #94e4c60d, #93c7f706);
+  margin-bottom: 16px;
+}
+.scan-summary-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #94e4c612;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.scan-summary strong {
+  font-size: 15px;
+}
+.scan-summary p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.ocr-basis {
+  margin: 19px 0;
+}
+.ocr-primary-grid {
+  gap: 16px 13px;
+}
+.ocr-field > span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+.ocr-field > span small {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.ocr-field input {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  border-radius: 13px;
+  background: #0e1a25;
+  min-width: 0;
+  width: 100%;
+}
+.ocr-field-hint {
+  display: block;
+  color: #e8bc79;
+  font-size: 10px;
+  line-height: 1.4;
+  margin-top: 4px;
+  font-weight: 400;
+}
+.ocr-other,
+.label-text {
+  border-top: 1px solid #ffffff0c;
+  margin-top: 20px;
+  padding-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.ocr-other summary,
+.label-text summary {
+  cursor: pointer;
+}
+.ocr-confirm {
+  margin-top: 23px;
+  font-size: 12px !important;
+  line-height: 1.55;
+  align-items: flex-start;
+}
+.ocr-confirm input {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.label-scanner .label-proof {
+  border-radius: 12px;
+  padding: 11px 13px;
+  background: #ffffff04;
+  margin-bottom: 7px;
+}
+.label-scanner .label-proof img {
+  max-height: 360px;
+}
+.label-scanner .label-warning {
+  font-size: 12px;
+  line-height: 1.55;
+  border-radius: 13px;
+}
+@media (max-width: 600px) {
+  .label-scanner {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 20px);
+    border-radius: 22px;
+  }
+  .label-scanner .dialog-head {
+    padding: 18px;
+  }
+  .label-scanner #label-stage {
+    padding: 18px;
+  }
+  .label-scanner .dialog-head h2 {
+    font-size: 21px;
+  }
+  .ocr-primary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 11px;
+  }
+  .ocr-field input {
+    font-size: 18px !important;
+    min-height: 50px;
+  }
+  .onboard-form h2 {
+    font-size: 26px;
+  }
+  .scan-summary {
+    padding: 12px;
+  }
+  .scan-summary p {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .goal-option {
+    transition: none;
+  }
+}

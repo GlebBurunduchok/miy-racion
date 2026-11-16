@@ -26,7 +26,13 @@
     if (bmr <= 0)
       return { kcal: null, p: null, f: null, c: null, mode: 'none', bmr: null, tdee: null };
     const lowBMI = p.weight / (p.height / 100) ** 2 < 18.5,
-      goal = p.goal === 'lose' && lowBMI ? 'maintain' : p.goal;
+      goal =
+        (p.goal === 'lose' && lowBMI) ||
+        (p.targetWeight != null &&
+          ((p.goal === 'lose' && p.weight <= p.targetWeight) ||
+            (p.goal === 'gain' && p.weight >= p.targetWeight)))
+          ? 'maintain'
+          : p.goal;
     const kcal =
       Math.round(Math.max(bmr, tdee * (goal === 'lose' ? 0.85 : goal === 'gain' ? 1.1 : 1)) / 10) *
       10;
@@ -54,7 +60,8 @@
       p.activity >= 0 &&
       p.activity <= 4 &&
       ['lose', 'maintain', 'gain'].includes(p.goal) &&
-      typeof p.special === 'boolean'
+      typeof p.special === 'boolean' &&
+      (p.targetWeight == null || finite(p.targetWeight, 20, 350))
     );
   }
   function validFood(f) {

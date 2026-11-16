@@ -164,3 +164,79 @@ Object.assign(window.RATION_TEXT, {
   labelPhoto: ['Фото етикетки', 'Фото этикетки', 'Label photo'],
   nutrientUnit: ['Одиниця', 'Единица', 'Unit']
 });
+
+Object.assign(window.RATION_TEXT, {
+  chooseYear: ['Оберіть рік', 'Выбери год', 'Choose year'],
+  chooseSex: ['Оберіть стать', 'Выбери пол', 'Choose sex'],
+  chooseActivity: ['Оберіть активність', 'Выбери активность', 'Choose activity'],
+  activityHelp: [
+    'Оцініть звичайний тиждень, враховуючи роботу та тренування.',
+    'Оцени обычную неделю: работу, движение и тренировки.',
+    'Choose what best describes your usual work, movement and exercise.'
+  ],
+  actDetail0: [
+    'переважно сидяча робота, без регулярних тренувань',
+    'сидячая работа, без регулярных тренировок',
+    'mostly sitting, no regular exercise'
+  ],
+  actDetail1: [
+    'прогулянки та легкі тренування 1–3 рази на тиждень',
+    'прогулки и лёгкие тренировки 1–3 раза в неделю',
+    'walking and light exercise 1–3 times a week'
+  ],
+  actDetail2: [
+    'тренування 3–5 разів на тиждень, рух протягом дня',
+    'тренировки 3–5 раз в неделю, движение в течение дня',
+    'exercise 3–5 times a week, some daily movement'
+  ],
+  actDetail3: [
+    'інтенсивні тренування 6–7 разів на тиждень або фізична робота',
+    'интенсивные тренировки 6–7 раз в неделю или физическая работа',
+    'hard exercise 6–7 times a week or physical work'
+  ],
+  actDetail4: [
+    'важка фізична робота разом із щоденними тренуваннями',
+    'тяжёлая физическая работа вместе с ежедневными тренировками',
+    'heavy physical work plus daily training'
+  ],
+  targetWeight: ['Цільова вага', 'Целевой вес', 'Target weight'],
+  targetWeightHelp: [
+    'Необов’язково. Відображатиметься в розділі «Мій прогрес».',
+    'Необязательно. Будет показан в разделе «Мой прогресс».',
+    'Optional. Shown in My progress.'
+  ],
+  targetWeightDirection: [
+    'Для зниження оберіть меншу вагу, для набору — більшу.',
+    'Для снижения выбери меньший вес, для набора — больший.',
+    'Choose a lower weight for loss or a higher weight for gain.'
+  ],
+  manualPlan: [
+    'Ввести норми калорій і БЖВ вручну',
+    'Ввести нормы калорий и БЖУ вручную',
+    'Enter calorie and macro targets manually'
+  ],
+  manualPlanHelp: [
+    'Увімкніть, якщо вже маєте власні норми. Інакше застосунок розрахує їх за параметрами.',
+    'Включи, если у тебя уже есть свои нормы. Иначе приложение рассчитает их по параметрам.',
+    'Enable if you already have targets. Otherwise, the app calculates them from your details.'
+  ],
+  toGoal: ['До мети', 'До цели', 'To goal']
+});
+
+Object.assign(window.RATION_TEXT, {
+  activityGuide: ['Як обрати активність', 'Как выбрать активность', 'How to choose activity']
+});
+
+Object.assign(window.RATION_TEXT, {
+  recognizedValues: ['показників прочитано', 'показателей прочитано', 'values read'],
+  scanReviewHint: [
+    'Звірте цифри з фото. Порожні поля можна доповнити.',
+    'Сверь цифры с фото. Пустые поля можно дополнить.',
+    'Check the numbers against the photo. Empty fields can be completed.'
+  ],
+  checkWithPhoto: ['Перевірте за фото', 'Проверь по фото', 'Check the photo']
+});
+
+Object.assign(window.RATION_TEXT, {
+  otherLabelData: ['Інші показники', 'Другие показатели', 'Other nutrients']
+});

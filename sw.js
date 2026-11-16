@@ -1,5 +1,5 @@
 // Compact GitHub Pages build. OCR models are hosted with the app.
-const CACHE="mii-ratsion-4.1.0-pages-05706022db72";
+const CACHE="mii-ratsion-4.2.0-pages-0ff7f7c55ef1";
 const LAZY=["./vendor/ocr/tesseract.min.js","./vendor/ocr/worker.min.js","./vendor/ocr/core/tesseract-core-lstm.wasm.js","./vendor/ocr/core/tesseract-core-simd-lstm.wasm.js","./vendor/ocr/lang/ukr.traineddata.gz","./vendor/ocr/lang/eng.traineddata.gz","./vendor/ocr/lang/rus.traineddata.gz"];
 const FILES=["./","./index.html","./styles.css","./community.css","./data.js","./strings.js","./feature-strings.js","./community-strings.js","./catalog.js","./product-assets.js","./product-photos.js","./ingredient-photos.js","./core.js","./search.js","./nutrition.js","./features.js","./community.js","./label.js","./ocr.js","./providers.js","./storage.js","./api.js","./media.js","./feature-ui.js","./privacy-content.js","./privacy-ui.js","./community-ui.js","./app.js","./manifest.webmanifest","./assets/icon-v2-3.svg","./assets/icon-v2-3-180.png","./assets/icon-v2-3-192.png","./assets/icon-v2-3-512.png","./assets/bowl.jpg","./assets/welcome.jpg","./assets/products/milka-7622210834751.jpg","./assets/products/water-4820051240233.jpg","./vendor/zxing-browser.min.js"];
 /* The build supplies CACHE, FILES and LAZY from project.config.mjs. */

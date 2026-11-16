@@ -1,7 +1,7 @@
-Мій раціон 4.1 — GitHub Pages
+Мій раціон 4.2 — GitHub Pages
 
 1. Распакуй архив. Открой репозиторий → Add file → Upload files.
-2. Перетащи СОДЕРЖИМОЕ папки GitHub_Upload_v4_1: index.html, JS/CSS, assets, vendor и остальные файлы.
+2. Перетащи СОДЕРЖИМОЕ папки GitHub_Upload_v4_2: index.html, JS/CSS, assets, vendor и остальные файлы.
 3. Дождись окончания загрузки и нажми Commit changes.
 
 index.html должен быть в корне выбранной папки публикации GitHub Pages. Сам ZIP загружать как сайт не нужно.
